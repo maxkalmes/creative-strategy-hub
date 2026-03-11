@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Kopari Creative Strategy</title>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+  const firebaseConfig = {
+    apiKey:            "AIzaSyDgsDI8pORzW498xSQRKpx_y5t0vP21rpU",
+    authDomain:        "kopari-tracker.firebaseapp.com",
+    databaseURL:       "https://kopari-tracker-default-rtdb.firebaseio.com",
+    projectId:         "kopari-tracker",
+    storageBucket:     "kopari-tracker.firebasestorage.app",
+    messagingSenderId: "242410831408",
+    appId:             "1:242410831408:web:ff3f73855b000d4d5db7f5"
+  };
+  const app = initializeApp(firebaseConfig);
+  const db  = getDatabase(app);
+  window.__fbDb=db; window.__fbRef=ref; window.__fbSet=set; window.__fbOn=onValue;
+  window.__fbReady=true;
+  document.dispatchEvent(new Event("fb-ready"));
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:#f7f5f2;color:#1a1a1a;min-height:100vh}
+button,input,textarea,select{font-family:'DM Sans',sans-serif}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-thumb{background:#d1c9c0;border-radius:4px}
+
+#loading{position:fixed;inset:0;background:#f7f5f2;display:flex;align-items:center;justify-content:center;z-index:9999}
+.loading-inner{text-align:center}
+.loading-dot{width:10px;height:10px;border-radius:50%;background:#e8c4b8;display:inline-block;animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.3;transform:scale(.8)}50%{opacity:1;transform:scale(1.1)}}
+
+.top-bar{background:#1a1a1a;padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:52px;position:sticky;top:0;z-index:100}
+.brand{font-family:'Syne',sans-serif;font-weight:800;font-size:12px;letter-spacing:.2em;color:#e8c4b8;text-transform:uppercase}
+.top-divider{color:#333;margin:0 12px}
+.top-title{font-family:'Syne',sans-serif;font-weight:600;font-size:13px;color:#fff;letter-spacing:.03em}
+.sync-wrap{display:flex;align-items:center;gap:6px}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:#f59e0b}
+.sync-txt{font-size:11px;color:#9ca3af}
+
+.page{padding:32px;max-width:1560px;margin:0 auto}
+
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:28px;gap:16px;flex-wrap:wrap}
+.page-title{font-family:'Syne',sans-serif;font-weight:800;font-size:26px;color:#1a1a1a;letter-spacing:-.3px}
+.page-sub{font-size:12px;color:#a89f94;margin-top:5px;letter-spacing:.02em}
+
+/* STATS */
+.stats-row{display:flex;gap:12px;margin-bottom:28px;flex-wrap:wrap}
+.stat{background:#fff;border:1px solid #ede8e3;border-radius:14px;padding:14px 20px;flex:1;min-width:100px}
+.stat-num{font-family:'Syne',sans-serif;font-weight:800;font-size:22px;color:#1a1a1a}
+.stat-label{font-size:11px;color:#a89f94;font-weight:500;margin-top:2px}
+
+/* FILTER TABS */
+.filter-tabs{display:flex;gap:4px;margin-bottom:24px;flex-wrap:wrap}
+.ftab{padding:7px 16px;border-radius:8px;font-size:12px;font-weight:600;color:#6b7280;cursor:pointer;border:1.5px solid transparent;background:#fff;transition:all .15s}
+.ftab:hover{background:#f0ece8}
+.ftab.active{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
+
+/* PRODUCT GRID */
+.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:18px}
+.pcard{background:#fff;border-radius:18px;border:1px solid #ede8e3;overflow:hidden;cursor:pointer;transition:all .2s}
+.pcard:hover{box-shadow:0 6px 24px rgba(0,0,0,.08);transform:translateY(-1px)}
+.pcard-top{padding:16px 18px 12px;display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.pcard-name{font-family:'Syne',sans-serif;font-weight:700;font-size:15px;color:#1a1a1a;line-height:1.3}
+.stage-pill{padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;flex-shrink:0}
+.pcard-body{padding:0 18px 16px}
+.stage-track{display:flex;gap:3px;margin-bottom:12px}
+.stage-pip{height:3px;flex:1;border-radius:2px;background:#f0ece8;transition:background .3s}
+.stage-pip.done{background:#e8c4b8}
+.stage-pip.active{background:#1a1a1a}
+.pcard-preview{font-size:12px;color:#7a7069;line-height:1.6;margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:38px}
+.pcard-footer{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.task-progress{font-size:11px;color:#a89f94;font-weight:500}
+.pcard-btns{display:flex;gap:5px;opacity:0;transition:opacity .15s}
+.pcard:hover .pcard-btns{opacity:1}
+
+/* BUTTONS */
+.btn{padding:8px 16px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;border:none;transition:all .15s;display:inline-flex;align-items:center;gap:5px;letter-spacing:.01em}
+.btn-dark{background:#1a1a1a;color:#fff}
+.btn-dark:hover{background:#2d2d2d}
+.btn-cream{background:#f0ece8;color:#1a1a1a}
+.btn-cream:hover{background:#e8e2dc}
+.btn-ghost{background:transparent;color:#6b7280;border:1px solid #e5e1dd}
+.btn-ghost:hover{background:#f7f5f2}
+.btn-danger{background:#fee2e2;color:#dc2626;border:none}
+.btn-danger:hover{background:#fecaca}
+.btn-sm{padding:5px 11px;font-size:11px;border-radius:7px}
+
+/* DETAIL VIEW */
+.detail-header{display:flex;align-items:center;gap:14px;margin-bottom:24px;flex-wrap:wrap}
+.back-btn{padding:7px 14px;border-radius:9px;border:1px solid #e5e1dd;background:#fff;font-size:12px;font-weight:600;color:#6b7280;cursor:pointer;transition:all .15s}
+.back-btn:hover{background:#f7f5f2}
+.detail-name{font-family:'Syne',sans-serif;font-weight:800;font-size:24px;color:#1a1a1a;flex:1}
+
+/* PIPELINE */
+.pipeline{display:flex;margin-bottom:28px;overflow-x:auto;padding-bottom:4px;border-radius:12px;overflow:hidden;border:1px solid #ede8e3}
+.pip-btn{flex:1;padding:10px 8px;font-size:11px;font-weight:700;border:none;cursor:pointer;transition:all .15s;white-space:nowrap;text-align:center;letter-spacing:.05em;text-transform:uppercase;min-width:100px}
+.pip-btn:not(:last-child){border-right:1px solid rgba(0,0,0,.06)}
+
+/* INNER TABS */
+.inner-tabs{display:flex;gap:4px;margin-bottom:24px;background:#f0ece8;border-radius:11px;padding:4px;width:fit-content}
+.itab{padding:7px 18px;border-radius:8px;font-size:12px;font-weight:600;color:#7a7069;cursor:pointer;border:none;background:transparent;transition:all .15s}
+.itab.active{background:#fff;color:#1a1a1a;box-shadow:0 1px 4px rgba(0,0,0,.09)}
+
+/* STRATEGY */
+.strategy-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:700px){.strategy-grid{grid-template-columns:1fr}}
+.sq-card{background:#faf8f5;border:1px solid #ede8e3;border-radius:13px;padding:14px}
+.sq-cat{display:inline-block;padding:2px 8px;border-radius:5px;font-size:10px;font-weight:700;letter-spacing:.05em;margin-bottom:7px}
+.cat-main{background:#fce7f3;color:#be185d}
+.cat-awareness{background:#ede9fe;color:#6d28d9}
+.cat-hook{background:#dcfce7;color:#166534}
+.cat-conversion{background:#fef3c7;color:#92400e}
+.sq-q{font-size:12px;font-weight:600;color:#374151;margin-bottom:8px;line-height:1.5}
+
+/* BRIEF */
+.brief-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:700px){.brief-grid{grid-template-columns:1fr}}
+.brief-field{background:#faf8f5;border:1px solid #ede8e3;border-radius:12px;padding:14px}
+.brief-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#a89f94;margin-bottom:6px}
+.brief-val{font-size:13px;color:#374151;line-height:1.6;white-space:pre-wrap}
+.brief-empty{font-size:12px;color:#c4b8af;font-style:italic}
+
+/* TASKS */
+.tasks-list{display:flex;flex-direction:column;gap:8px}
+.task-row{background:#fff;border:1px solid #ede8e3;border-radius:12px;padding:12px 14px;display:flex;gap:11px;align-items:flex-start;transition:box-shadow .15s}
+.task-row:hover{box-shadow:0 2px 10px rgba(0,0,0,.06)}
+.tcheck{width:20px;height:20px;border-radius:6px;border:2px solid #d4ccc5;cursor:pointer;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:12px;transition:all .15s}
+.tcheck.done{background:#1a1a1a;border-color:#1a1a1a;color:#fff}
+.tbody{flex:1;min-width:0}
+.ttitle{font-size:13px;font-weight:600;color:#1a1a1a;margin-bottom:3px;transition:color .15s}
+.ttitle.done{text-decoration:line-through;color:#a89f94}
+.tmeta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:4px}
+.task-tag{font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px}
+.tactions{display:flex;gap:4px;opacity:0;transition:opacity .15s;flex-shrink:0}
+.task-row:hover .tactions{opacity:1}
+.icon-btn{width:26px;height:26px;border-radius:7px;border:none;background:#f0ece8;color:#6b7280;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.icon-btn:hover{background:#e8e2dc}
+
+/* MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(26,26,26,.5);display:flex;align-items:flex-start;justify-content:center;z-index:1000;padding:40px 16px;overflow-y:auto;backdrop-filter:blur(4px)}
+.modal{background:#fff;border-radius:22px;width:100%;max-width:720px;overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,.18)}
+.mhead{padding:22px 26px 18px;border-bottom:1px solid #f0ece8;display:flex;align-items:center;justify-content:space-between}
+.mtitle{font-family:'Syne',sans-serif;font-weight:800;font-size:17px;color:#1a1a1a}
+.mclose{width:30px;height:30px;border-radius:8px;border:none;background:#f0ece8;color:#7a7069;cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center;line-height:1}
+.mclose:hover{background:#e8e2dc}
+.mbody{padding:22px 26px;max-height:68vh;overflow-y:auto}
+.mfoot{padding:14px 26px;border-top:1px solid #f0ece8;display:flex;gap:8px;justify-content:flex-end}
+
+/* FORM */
+.frow{margin-bottom:14px}
+.label{font-size:12px;font-weight:600;color:#374151;margin-bottom:5px;display:block}
+.input{width:100%;padding:9px 12px;border:1.5px solid #e5e1dd;border-radius:10px;font-size:13px;color:#1a1a1a;outline:none;transition:border-color .15s;background:#fafaf9}
+.input:focus{border-color:#1a1a1a;background:#fff}
+textarea.input{resize:vertical;min-height:76px;line-height:1.6}
+.stage-sel{display:flex;gap:5px;flex-wrap:wrap}
+.sstage{padding:5px 12px;border-radius:8px;font-size:11px;font-weight:700;border:1.5px solid #e5e1dd;background:#fff;color:#6b7280;cursor:pointer;transition:all .15s;letter-spacing:.03em}
+
+/* EMPTY */
+.empty{text-align:center;padding:52px 24px;color:#a89f94}
+.empty-icon{font-size:32px;margin-bottom:12px}
+.empty-text{font-size:14px;font-weight:600;color:#6b7280;margin-bottom:4px}
+.empty-sub{font-size:12px}
+
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.section-desc{font-size:12px;color:#a89f94}
+</style>
+</head>
+<body>
+<div id="loading"><div class="loading-inner"><div class="loading-dot"></div></div></div>
+
+<div id="app" style="display:none">
+  <div class="top-bar">
+    <div style="display:flex;align-items:center">
+      <span class="brand">Kopari</span>
+      <span class="top-divider">·</span>
+      <span class="top-title">Creative Strategy Hub</span>
+    </div>
+    <div class="sync-wrap">
+      <span class="sync-dot" id="syncDot"></span>
+      <span class="sync-txt" id="syncTxt">Connecting…</span>
+    </div>
+  </div>
+  <div class="page" id="mainPage"></div>
+</div>
+
+<script>
+// ══ CONFIG ══
+const STAGES = ["Strategy","Brief","Assigned","In Production","Live"];
+const SC = {
+  "Strategy":      {bg:"#fef3c7",color:"#92400e"},
+  "Brief":         {bg:"#dbeafe",color:"#1d4ed8"},
+  "Assigned":      {bg:"#ede9fe",color:"#6d28d9"},
+  "In Production": {bg:"#fce7f3",color:"#be185d"},
+  "Live":          {bg:"#dcfce7",color:"#166534"}
+};
+const STRATEGY_QS = [
+  {id:"main_thing",    label:"What does this product do that nothing else does?",        cat:"main",       catLabel:"Main Thing"},
+  {id:"emotional",     label:"What's the emotional payoff, not just the functional one?", cat:"main",       catLabel:"Main Thing"},
+  {id:"one_thing",     label:"If customers only remember ONE thing, what is it?",         cat:"main",       catLabel:"Main Thing"},
+  {id:"pain_point",    label:"What's the biggest pain point this product solves?",        cat:"awareness",  catLabel:"Awareness"},
+  {id:"value",         label:"What's the biggest value this product provides?",           cat:"awareness",  catLabel:"Awareness"},
+  {id:"stop_scroll",   label:"What would make someone stop scrolling?",                   cat:"hook",       catLabel:"Hook"},
+  {id:"objections",    label:"What objections might customers have that we can answer?",  cat:"conversion", catLabel:"Conversion"},
+  {id:"differentiator",label:"How is this different from competitors?",                   cat:"conversion", catLabel:"Conversion"},
+];
+
+// ══ STATE ══
+let state = { products: {} };
+let view = "overview"; // "overview" | productId
+let _db, _ref, _set, _on, saveTimer, listening=false;
+let detailTab = "strategy";
+
+// ══ FIREBASE ══
+function initFB() {
+  _db=window.__fbDb; _ref=window.__fbRef; _set=window.__fbSet; _on=window.__fbOn;
+  if (listening) return; listening=true;
+  _on(_ref(_db,"kopari_strategy"), snap=>{
+    const val=snap.val();
+    if (val?.products) state.products=val.products;
+    document.getElementById("loading").style.display="none";
+    document.getElementById("app").style.display="block";
+    render();
+    document.getElementById("syncDot").style.background="#6ee7b7";
+    document.getElementById("syncTxt").textContent="Live ✓";
+  });
+}
+
+function save() {
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(()=>{ _set(_ref(_db,"kopari_strategy"),state); },700);
+}
+
+// ══ UTILS ══
+function genId(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,5); }
+function h(tag, attrs={}, ...kids){
+  const el=document.createElement(tag);
+  for(const [k,v] of Object.entries(attrs)){
+    if(k.startsWith("on")) el[k]=v;
+    else if(k==="class") el.className=v;
+    else el.setAttribute(k,v);
+  }
+  kids.flat().forEach(c=>{ if(c==null)return; el.appendChild(typeof c==="string"?document.createTextNode(c):c); });
+  return el;
+}
+function css(el,s){ Object.assign(el.style,s); return el; }
+function stageIdx(s){ return STAGES.indexOf(s); }
+
+// ══ RENDER ══
+function render(){
+  const page=document.getElementById("mainPage");
+  const sy=window.scrollY;
+  page.innerHTML="";
+  if(view==="overview") page.appendChild(buildOverview());
+  else {
+    const p=state.products[view];
+    if(p) page.appendChild(buildDetail(view,p));
+    else { view="overview"; page.appendChild(buildOverview()); }
+  }
+  window.scrollTo(0,sy);
+}
+
+// ══ OVERVIEW ══
+function buildOverview(){
+  const frag=document.createDocumentFragment();
+  const prods=Object.entries(state.products);
+
+  // Header
+  const hdr=h("div",{class:"page-header"});
+  const tblock=h("div");
+  tblock.appendChild(h("div",{class:"page-title"},"Creative Strategy"));
+  tblock.appendChild(h("div",{class:"page-sub"},"Strategy  →  Brief  →  Assigned  →  In Production  →  Live"));
+  hdr.appendChild(tblock);
+  hdr.appendChild(h("button",{class:"btn btn-dark",onclick:()=>openProductModal()},"+ New Product"));
+  frag.appendChild(hdr);
+
+  // Stats
+  const stats=h("div",{class:"stats-row"});
+  const counts={};
+  STAGES.forEach(s=>counts[s]=0);
+  prods.forEach(([,p])=>{ if(counts[p.stage]!==undefined) counts[p.stage]++; });
+  stats.appendChild(mkStat(prods.length,"Total"));
+  STAGES.forEach(s=>stats.appendChild(mkStat(counts[s],s)));
+  frag.appendChild(stats);
+
+  // Filter tabs
+  let activeFilter="All";
+  const filterWrap=h("div",{class:"filter-tabs"});
+  const allFilters=["All",...STAGES];
+  const grid=h("div",{class:"products-grid"});
+
+  function applyFilter(f){
+    activeFilter=f;
+    filterWrap.querySelectorAll(".ftab").forEach((t,i)=>t.classList.toggle("active",allFilters[i]===f));
+    grid.innerHTML="";
+    const filtered=f==="All"?prods:prods.filter(([,p])=>p.stage===f);
+    if(filtered.length===0){
+      const empty=h("div",{class:"empty",style:"grid-column:1/-1"});
+      empty.appendChild(h("div",{class:"empty-icon"},"✦"));
+      empty.appendChild(h("div",{class:"empty-text"},f==="All"?"No products yet":"None in "+f));
+      grid.appendChild(empty);
+    } else {
+      filtered.forEach(([id,p])=>grid.appendChild(buildPcard(id,p)));
+    }
+  }
+
+  allFilters.forEach(f=>{
+    const t=h("button",{class:"ftab"+(f==="All"?" active":""),onclick:()=>applyFilter(f)},f);
+    filterWrap.appendChild(t);
+  });
+  frag.appendChild(filterWrap);
+
+  applyFilter("All");
+  frag.appendChild(grid);
+  return frag;
+}
+
+function mkStat(n,label){
+  const c=h("div",{class:"stat"});
+  c.appendChild(h("div",{class:"stat-num"},String(n)));
+  c.appendChild(h("div",{class:"stat-label"},label));
+  return c;
+}
+
+function buildPcard(id,p){
+  const card=h("div",{class:"pcard",onclick:()=>{view=id;detailTab="strategy";render();}});
+  const sc=SC[p.stage||"Strategy"];
+
+  const top=h("div",{class:"pcard-top"});
+  top.appendChild(h("div",{class:"pcard-name"},p.name||"Untitled"));
+  top.appendChild(css(h("div",{class:"stage-pill"},p.stage||"Strategy"),{background:sc.bg,color:sc.color}));
+  card.appendChild(top);
+
+  const body=h("div",{class:"pcard-body"});
+  const track=h("div",{class:"stage-track"});
+  const si=stageIdx(p.stage||"Strategy");
+  STAGES.forEach((_,i)=>track.appendChild(h("div",{class:"stage-pip"+(i<si?" done":i===si?" active":"")})));
+  body.appendChild(track);
+
+  const preview=p.strategy?.main_thing||p.strategy?.one_thing||"";
+  body.appendChild(css(h("div",{class:"pcard-preview"},preview||"No strategy notes yet"),{color:preview?"#7a7069":"#c4b8af",fontStyle:preview?"normal":"italic"}));
+
+  const footer=h("div",{class:"pcard-footer"});
+  const tasks=p.tasks||[];
+  const done=tasks.filter(t=>t.done).length;
+  footer.appendChild(h("div",{class:"task-progress"},tasks.length>0?`✓ ${done}/${tasks.length} tasks`:"No tasks"));
+
+  const btns=h("div",{class:"pcard-btns"});
+  btns.appendChild(h("button",{class:"btn btn-cream btn-sm",onclick:e=>{e.stopPropagation();openProductModal(id,p);}},  "Edit"));
+  btns.appendChild(h("button",{class:"btn btn-danger btn-sm",onclick:e=>{e.stopPropagation();if(confirm("Delete "+p.name+"?")){delete state.products[id];save();render();}}}, "✕"));
+  footer.appendChild(btns);
+  body.appendChild(footer);
+  card.appendChild(body);
+  return card;
+}
+
+// ══ DETAIL ══
+function buildDetail(id,p){
+  const frag=document.createDocumentFragment();
+
+  // Header
+  const hdr=h("div",{class:"detail-header"});
+  hdr.appendChild(h("button",{class:"back-btn",onclick:()=>{view="overview";render();}},"← Products"));
+  hdr.appendChild(h("div",{class:"detail-name"},p.name));
+  const sc=SC[p.stage||"Strategy"];
+  hdr.appendChild(css(h("div",{class:"stage-pill"},p.stage||"Strategy"),{background:sc.bg,color:sc.color}));
+  frag.appendChild(hdr);
+
+  // Pipeline
+  const pipeline=h("div",{class:"pipeline"});
+  const curIdx=stageIdx(p.stage||"Strategy");
+  STAGES.forEach((s,i)=>{
+    const sc2=SC[s];
+    const isActive=i===curIdx, isDone=i<curIdx;
+    const btn=css(h("button",{class:"pip-btn",onclick:()=>{state.products[id].stage=s;save();render();}},s),{
+      background: isActive?"#1a1a1a":isDone?sc2.bg:"#f7f5f2",
+      color: isActive?"#fff":isDone?sc2.color:"#a89f94",
+    });
+    pipeline.appendChild(btn);
+  });
+  frag.appendChild(pipeline);
+
+  // Inner tabs
+  const tabs=h("div",{class:"inner-tabs"});
+  const taskCount=(p.tasks||[]).length;
+  const sections=[
+    {id:"strategy",label:"📋 Strategy"},
+    {id:"brief",   label:"📄 Brief"},
+    {id:"tasks",   label:`✅ Tasks${taskCount>0?" ("+taskCount+")":""}`},
+  ];
+  const content=h("div");
+
+  function showTab(sid){
+    detailTab=sid;
+    tabs.querySelectorAll(".itab").forEach((t,i)=>t.classList.toggle("active",sections[i].id===sid));
+    content.innerHTML="";
+    if(sid==="strategy") content.appendChild(buildStrategy(id,p));
+    if(sid==="brief")    content.appendChild(buildBrief(id,p));
+    if(sid==="tasks")    content.appendChild(buildTasks(id,p));
+  }
+
+  sections.forEach(s=>{
+    tabs.appendChild(h("button",{class:"itab"+(s.id===detailTab?" active":""),onclick:()=>showTab(s.id)},s.label));
+  });
+  frag.appendChild(tabs);
+  showTab(detailTab);
+  frag.appendChild(content);
+  return frag;
+}
+
+// ── Strategy ──
+function buildStrategy(id,p){
+  const wrap=h("div");
+  wrap.appendChild(h("div",{class:"section-header"},
+    css(h("div",{class:"section-desc"},"Build your creative foundation — fill in as much as you know."),{}),
+    h("div")
+  ));
+  const grid=h("div",{class:"strategy-grid"});
+  const catCls={main:"cat-main",awareness:"cat-awareness",hook:"cat-hook",conversion:"cat-conversion"};
+  STRATEGY_QS.forEach(q=>{
+    const card=h("div",{class:"sq-card"});
+    card.appendChild(h("span",{class:"sq-cat "+catCls[q.cat]},q.catLabel));
+    card.appendChild(h("div",{class:"sq-q"},q.label));
+    const ta=h("textarea",{class:"input",placeholder:"Type your answer…"});
+    ta.style.minHeight="72px";
+    ta.value=p.strategy?.[q.id]||"";
+    ta.oninput=e=>{
+      if(!state.products[id].strategy) state.products[id].strategy={};
+      state.products[id].strategy[q.id]=e.target.value;
+      save();
+    };
+    card.appendChild(ta);
+    grid.appendChild(card);
+  });
+  wrap.appendChild(grid);
+  return wrap;
+}
+
+// ── Brief ──
+function buildBrief(id,p){
+  const wrap=h("div");
+  const shdr=h("div",{class:"section-header"});
+  shdr.appendChild(h("div",{class:"section-desc"},"Your creative brief for this product."));
+  shdr.appendChild(h("button",{class:"btn btn-dark btn-sm",onclick:()=>openBriefModal(id,p)},"Edit Brief"));
+  wrap.appendChild(shdr);
+  const brief=p.brief||{};
+  const fields=[
+    {key:"objective",  label:"Campaign Objective"},
+    {key:"audience",   label:"Target Audience"},
+    {key:"formats",    label:"Content Formats"},
+    {key:"hooks",      label:"Hook Ideas"},
+    {key:"dos",        label:"Do's"},
+    {key:"donts",      label:"Don'ts"},
+    {key:"references", label:"References / Inspo"},
+    {key:"deadline",   label:"Deadline"},
+  ];
+  const grid=h("div",{class:"brief-grid"});
+  fields.forEach(f=>{
+    const c=h("div",{class:"brief-field"});
+    c.appendChild(h("div",{class:"brief-label"},f.label));
+    c.appendChild(brief[f.key]?h("div",{class:"brief-val"},brief[f.key]):h("div",{class:"brief-empty"},"Not filled in yet"));
+    grid.appendChild(c);
+  });
+  wrap.appendChild(grid);
+  return wrap;
+}
+
+// ── Tasks ──
+function buildTasks(id,p){
+  const wrap=h("div");
+  const shdr=h("div",{class:"section-header"});
+  shdr.appendChild(h("div",{class:"section-desc"},"Track every production task from brief to live."));
+  shdr.appendChild(h("button",{class:"btn btn-dark btn-sm",onclick:()=>openTaskModal(id,p,null)},"+ Add Task"));
+  wrap.appendChild(shdr);
+  const tasks=p.tasks||[];
+  if(!tasks.length){
+    const empty=h("div",{class:"empty",style:"padding:32px"});
+    empty.appendChild(h("div",{class:"empty-icon"},"✅"));
+    empty.appendChild(h("div",{class:"empty-text"},"No tasks yet"));
+    empty.appendChild(h("div",{class:"empty-sub"},"Add tasks to track who's doing what"));
+    wrap.appendChild(empty);
+    return wrap;
+  }
+  const list=h("div",{class:"tasks-list"});
+  tasks.forEach((t,i)=>{
+    const row=h("div",{class:"task-row"});
+    const chk=h("div",{class:"tcheck"+(t.done?" done":""),onclick:()=>{state.products[id].tasks[i].done=!t.done;save();render();}});
+    if(t.done) chk.textContent="✓";
+    row.appendChild(chk);
+    const body=h("div",{class:"tbody"});
+    body.appendChild(h("div",{class:"ttitle"+(t.done?" done":"")},t.title||"Untitled"));
+    const meta=h("div",{class:"tmeta"});
+    if(t.assignee) meta.appendChild(css(h("span",{},"👤 "+t.assignee),{fontSize:"11px",color:"#6b7280",fontWeight:"500"}));
+    if(t.due)      meta.appendChild(css(h("span",{},"📅 "+t.due),{fontSize:"11px",color:"#a89f94"}));
+    if(t.stage){const sc=SC[t.stage]||{};meta.appendChild(css(h("span",{class:"task-tag"},t.stage),{background:sc.bg,color:sc.color}));}
+    if(meta.children.length) body.appendChild(meta);
+    if(t.notes) body.appendChild(css(h("div",{},t.notes),{fontSize:"11px",color:"#a89f94",marginTop:"4px",lineHeight:"1.5"}));
+    row.appendChild(body);
+    const acts=h("div",{class:"tactions"});
+    acts.appendChild(h("button",{class:"icon-btn",onclick:()=>openTaskModal(id,p,i)},"✎"));
+    acts.appendChild(css(h("button",{class:"icon-btn",onclick:()=>{state.products[id].tasks.splice(i,1);save();render();}},"✕"),{background:"#fee2e2",color:"#dc2626"}));
+    row.appendChild(acts);
+    list.appendChild(row);
+  });
+  wrap.appendChild(list);
+  return wrap;
+}
+
+// ══ MODALS ══
+function openProductModal(id=null,p=null){
+  const isEdit=!!id;
+  const bg=h("div",{class:"modal-bg"});
+  bg.onclick=e=>{if(e.target===bg)bg.remove();};
+  const modal=h("div",{class:"modal"});
+  const mh=h("div",{class:"mhead"});
+  mh.appendChild(h("div",{class:"mtitle"},isEdit?"Edit Product":"New Product"));
+  mh.appendChild(h("button",{class:"mclose",onclick:()=>bg.remove()},"×"));
+  modal.appendChild(mh);
+  const mb=h("div",{class:"mbody"});
+
+  const nr=h("div",{class:"frow"});
+  nr.appendChild(h("label",{class:"label"},"Product Name"));
+  const ni=h("input",{class:"input",placeholder:"e.g. Sun Veil Illuminator",value:p?.name||""});
+  nr.appendChild(ni); mb.appendChild(nr);
+
+  const sr=h("div",{class:"frow"});
+  sr.appendChild(h("label",{class:"label"},"Current Stage"));
+  let selStage=p?.stage||"Strategy";
+  const ss=h("div",{class:"stage-sel"});
+  STAGES.forEach(s=>{
+    const sc=SC[s];
+    const btn=h("button",{class:"sstage",onclick:()=>{
+      selStage=s;
+      ss.querySelectorAll(".sstage").forEach(b=>{b.style.background="";b.style.borderColor="";b.style.color="";});
+      Object.assign(btn.style,{background:sc.bg,borderColor:sc.color,color:sc.color});
+    }},s);
+    if(selStage===s) Object.assign(btn.style,{background:sc.bg,borderColor:sc.color,color:sc.color});
+    ss.appendChild(btn);
+  });
+  sr.appendChild(ss); mb.appendChild(sr);
+  modal.appendChild(mb);
+
+  const mf=h("div",{class:"mfoot"});
+  mf.appendChild(h("button",{class:"btn btn-ghost",onclick:()=>bg.remove()},"Cancel"));
+  mf.appendChild(h("button",{class:"btn btn-dark",onclick:()=>{
+    const name=ni.value.trim(); if(!name) return;
+    if(isEdit){state.products[id].name=name;state.products[id].stage=selStage;}
+    else{const nid=genId();state.products[nid]={name,stage:selStage,strategy:{},brief:{},tasks:[]};}
+    save();render();bg.remove();
+  }},isEdit?"Save Changes":"Create Product"));
+  modal.appendChild(mf);
+  bg.appendChild(modal); document.body.appendChild(bg);
+  setTimeout(()=>ni.focus(),50);
+}
+
+function openBriefModal(id,p){
+  const bg=h("div",{class:"modal-bg"});
+  bg.onclick=e=>{if(e.target===bg)bg.remove();};
+  const modal=h("div",{class:"modal"});
+  const mh=h("div",{class:"mhead"});
+  mh.appendChild(h("div",{class:"mtitle"},"Creative Brief — "+p.name));
+  mh.appendChild(h("button",{class:"mclose",onclick:()=>bg.remove()},"×"));
+  modal.appendChild(mh);
+  const mb=h("div",{class:"mbody"});
+  const brief={...(p.brief||{})};
+  const fields=[
+    {key:"objective", label:"Campaign Objective",     ph:"What's the goal of this content?"},
+    {key:"audience",  label:"Target Audience",         ph:"Who are we speaking to?"},
+    {key:"formats",   label:"Content Formats",         ph:"UGC, talking head, GRWM, demo…"},
+    {key:"hooks",     label:"Hook Ideas",              ph:"Opening lines or visual hooks to test"},
+    {key:"dos",       label:"Do's",                    ph:"Things creators should do"},
+    {key:"donts",     label:"Don'ts",                  ph:"Things to avoid"},
+    {key:"references",label:"References / Inspo",      ph:"Links or descriptions"},
+    {key:"deadline",  label:"Deadline",                ph:"e.g. March 20, 2026"},
+  ];
+  fields.forEach(f=>{
+    const r=h("div",{class:"frow"});
+    r.appendChild(h("label",{class:"label"},f.label));
+    const ta=h("textarea",{class:"input",placeholder:f.ph});
+    ta.value=brief[f.key]||"";
+    ta.oninput=e=>{brief[f.key]=e.target.value;};
+    r.appendChild(ta); mb.appendChild(r);
+  });
+  modal.appendChild(mb);
+  const mf=h("div",{class:"mfoot"});
+  mf.appendChild(h("button",{class:"btn btn-ghost",onclick:()=>bg.remove()},"Cancel"));
+  mf.appendChild(h("button",{class:"btn btn-dark",onclick:()=>{state.products[id].brief=brief;save();render();bg.remove();}},"Save Brief"));
+  modal.appendChild(mf);
+  bg.appendChild(modal); document.body.appendChild(bg);
+}
+
+function openTaskModal(id,p,idx){
+  const isEdit=idx!==null;
+  const ex=isEdit?p.tasks[idx]:{};
+  const bg=h("div",{class:"modal-bg"});
+  bg.onclick=e=>{if(e.target===bg)bg.remove();};
+  const modal=h("div",{class:"modal"});
+  const mh=h("div",{class:"mhead"});
+  mh.appendChild(h("div",{class:"mtitle"},isEdit?"Edit Task":"Add Task"));
+  mh.appendChild(h("button",{class:"mclose",onclick:()=>bg.remove()},"×"));
+  modal.appendChild(mh);
+  const mb=h("div",{class:"mbody"});
+  const vals={title:ex.title||"",assignee:ex.assignee||"",due:ex.due||"",notes:ex.notes||""};
+  [
+    {key:"title",    label:"Task",        type:"input",    ph:"e.g. Film UGC demo for Sun Veil"},
+    {key:"assignee", label:"Assigned To", type:"input",    ph:"e.g. Amber"},
+    {key:"due",      label:"Due Date",    type:"input",    ph:"e.g. March 20"},
+    {key:"notes",    label:"Notes",       type:"textarea", ph:"Any extra context…"},
+  ].forEach(f=>{
+    const r=h("div",{class:"frow"}); r.appendChild(h("label",{class:"label"},f.label));
+    const el=f.type==="textarea"?h("textarea",{class:"input",placeholder:f.ph}):h("input",{class:"input",placeholder:f.ph});
+    el.value=vals[f.key]; el.oninput=e=>{vals[f.key]=e.target.value;};
+    r.appendChild(el); mb.appendChild(r);
+  });
+  const sr2=h("div",{class:"frow"}); sr2.appendChild(h("label",{class:"label"},"Stage"));
+  let tStage=ex.stage||"Assigned";
+  const ss2=h("div",{class:"stage-sel"});
+  STAGES.forEach(s=>{
+    const sc=SC[s];
+    const btn=h("button",{class:"sstage",onclick:()=>{
+      tStage=s;
+      ss2.querySelectorAll(".sstage").forEach(b=>{b.style.background="";b.style.borderColor="";b.style.color="";});
+      Object.assign(btn.style,{background:sc.bg,borderColor:sc.color,color:sc.color});
+    }},s);
+    if(tStage===s) Object.assign(btn.style,{background:sc.bg,borderColor:sc.color,color:sc.color});
+    ss2.appendChild(btn);
+  });
+  sr2.appendChild(ss2); mb.appendChild(sr2);
+  modal.appendChild(mb);
+  const mf=h("div",{class:"mfoot"});
+  mf.appendChild(h("button",{class:"btn btn-ghost",onclick:()=>bg.remove()},"Cancel"));
+  mf.appendChild(h("button",{class:"btn btn-dark",onclick:()=>{
+    if(!vals.title.trim()) return;
+    const task={id:genId(),...vals,stage:tStage,done:ex.done||false};
+    if(!state.products[id].tasks) state.products[id].tasks=[];
+    if(isEdit) state.products[id].tasks[idx]=task;
+    else state.products[id].tasks.push(task);
+    save();render();bg.remove();
+  }},isEdit?"Save Task":"Add Task"));
+  modal.appendChild(mf);
+  bg.appendChild(modal); document.body.appendChild(bg);
+}
+
+// ══ BOOT ══
+if(window.__fbReady) initFB();
+else document.addEventListener("fb-ready",initFB);
+</script>
+</body>
+</html>
