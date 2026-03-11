@@ -411,8 +411,9 @@ function buildDetail(id,p){
   }
   tabs.forEach(t=>itabs.appendChild(h("button",{class:"itab"+(t.id===detailTab?" active":""),onclick:()=>showTab(t.id)},t.label)));
   frag.appendChild(itabs);
-  showTab(detailTab);
   frag.appendChild(content);
+  // Must append to frag first so DOM queries work, then show tab
+  setTimeout(()=>showTab(detailTab),0);
   return frag;
 }
 
