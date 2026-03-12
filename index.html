@@ -24,25 +24,12 @@
 </script>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet"/>
 <style>
-/* ── KOPARI BRAND COLORS ── */
 :root {
-  --teal:    #2ABFBF;
-  --cream:   #F0EDE4;
-  --navy:    #1B4B5A;
-  --brown:   #6B4A0B;
-  --lime:    #C8E000;
-  --pink:    #FF3EBF;
-  --blush:   #F9D9E7;
-  --yellow:  #F5E642;
-
-  --bg:      #F7F5F1;
-  --surface: #FFFFFF;
-  --border:  #E8E4DC;
-  --text:    #1a1a1a;
-  --muted:   #8a8278;
-  --subtle:  #b8b0a6;
+  --teal:#2ABFBF;--cream:#F0EDE4;--navy:#1B4B5A;--brown:#6B4A0B;
+  --lime:#C8E000;--pink:#FF3EBF;--blush:#F9D9E7;--yellow:#F5E642;
+  --bg:#F7F5F1;--surface:#FFFFFF;--border:#E8E4DC;
+  --text:#1a1a1a;--muted:#8a8278;--subtle:#b8b0a6;
 }
-
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased}
 button,input,textarea,select{font-family:'Plus Jakarta Sans',sans-serif}
@@ -50,13 +37,11 @@ button,input,textarea,select{font-family:'Plus Jakarta Sans',sans-serif}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
 
 #loading{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999;flex-direction:column;gap:16px}
-.l-logo{font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:13px;letter-spacing:.22em;color:var(--navy);text-transform:uppercase}
+.l-logo{font-weight:800;font-size:13px;letter-spacing:.22em;color:var(--navy);text-transform:uppercase}
 @keyframes pulse{0%,100%{opacity:.25;transform:scale(.8)}50%{opacity:1;transform:scale(1.1)}}
 .ldot{width:9px;height:9px;border-radius:50%;background:var(--teal);display:inline-block;animation:pulse 1.3s ease-in-out infinite}
 
-/* ── TOP BAR ── */
 .top-bar{background:var(--navy);padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:52px;position:sticky;top:0;z-index:100}
-.tb-left{display:flex;align-items:center;gap:0}
 .tb-brand{font-weight:800;font-size:12px;letter-spacing:.22em;color:var(--teal);text-transform:uppercase}
 .tb-sep{color:#2d6070;margin:0 14px;font-size:20px;font-weight:100}
 .tb-title{font-weight:600;font-size:13px;color:#fff;opacity:.9}
@@ -64,23 +49,18 @@ button,input,textarea,select{font-family:'Plus Jakarta Sans',sans-serif}
 .sync-dot{width:7px;height:7px;border-radius:50%;background:#f59e0b;flex-shrink:0;transition:background .4s}
 .sync-txt{font-size:11px;color:#6da8b8;font-weight:500}
 
-/* ── PAGE ── */
 .page{padding:32px;max-width:1480px;margin:0 auto}
 
-/* ── BREADCRUMB ── */
 .breadcrumb{display:flex;align-items:center;gap:8px;margin-bottom:26px;flex-wrap:wrap}
 .bc-item{font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;transition:color .15s}
-.bc-item:hover{color:var(--text)}
-.bc-item.active{color:var(--text)}
+.bc-item:hover{color:var(--text)}.bc-item.active{color:var(--text)}
 .bc-sep{color:var(--border);font-size:16px}
 
-/* ── PAGE HEADER ── */
 .page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:28px;gap:16px;flex-wrap:wrap}
 .page-title{font-weight:800;font-size:26px;color:var(--text);letter-spacing:-.4px;line-height:1.2}
 .page-sub{font-size:12px;color:var(--subtle);margin-top:5px;font-weight:500}
 .header-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 
-/* ── STATS ── */
 .stats-row{display:flex;gap:12px;margin-bottom:26px;flex-wrap:wrap}
 .stat{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 20px;flex:1;min-width:110px}
 .stat-num{font-weight:800;font-size:22px;color:var(--text);line-height:1}
@@ -89,27 +69,19 @@ button,input,textarea,select{font-family:'Plus Jakarta Sans',sans-serif}
 .stat.highlight .stat-num{color:var(--teal)}
 .stat.highlight .stat-label{color:#6da8b8}
 
-/* ── FILTER TABS ── */
 .filter-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;gap:12px;flex-wrap:wrap}
 .filter-tabs{display:flex;gap:4px;flex-wrap:wrap}
 .ftab{padding:7px 15px;border-radius:8px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;border:1.5px solid transparent;background:var(--surface);transition:all .15s}
-.ftab:hover{background:var(--cream)}
-.ftab.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+.ftab:hover{background:var(--cream)}.ftab.active{background:var(--navy);color:#fff;border-color:var(--navy)}
 
-/* ── BUTTONS ── */
 .btn{padding:9px 18px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;border:none;transition:all .15s;display:inline-flex;align-items:center;gap:6px;letter-spacing:.01em;white-space:nowrap}
-.btn-navy{background:var(--navy);color:#fff}
-.btn-navy:hover{background:#153d4a}
-.btn-teal{background:var(--teal);color:#fff}
-.btn-teal:hover{background:#22aaa9}
-.btn-ghost{background:transparent;color:var(--muted);border:1.5px solid var(--border)}
-.btn-ghost:hover{background:var(--cream)}
-.btn-danger{background:#fee2e2;color:#dc2626;border:none}
-.btn-danger:hover{background:#fecaca}
+.btn-navy{background:var(--navy);color:#fff}.btn-navy:hover{background:#153d4a}
+.btn-teal{background:var(--teal);color:#fff}.btn-teal:hover{background:#22aaa9}
+.btn-ghost{background:transparent;color:var(--muted);border:1.5px solid var(--border)}.btn-ghost:hover{background:var(--cream)}
+.btn-danger{background:#fee2e2;color:#dc2626;border:none}.btn-danger:hover{background:#fecaca}
 .btn-sm{padding:6px 13px;font-size:11px;border-radius:8px}
 .btn-xs{padding:4px 10px;font-size:11px;border-radius:7px}
 
-/* ── PRODUCT GRID ── */
 .products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
 .pcard{background:var(--surface);border-radius:18px;border:1px solid var(--border);overflow:hidden;cursor:pointer;transition:all .2s}
 .pcard:hover{box-shadow:0 6px 24px rgba(27,75,90,.1);transform:translateY(-2px);border-color:var(--teal)}
@@ -124,32 +96,25 @@ button,input,textarea,select{font-family:'Plus Jakarta Sans',sans-serif}
 .pcard-actions{display:flex;gap:5px;opacity:0;transition:opacity .15s}
 .pcard:hover .pcard-actions{opacity:1}
 
-/* ── STAGE PILL ── */
 .stage-pill{padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap;flex-shrink:0}
 
-/* ── PRODUCT DETAIL ── */
 .detail-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:28px;gap:16px;flex-wrap:wrap}
 .detail-title{font-weight:800;font-size:24px;color:var(--text);letter-spacing:-.3px}
 .detail-sub{font-size:12px;color:var(--subtle);margin-top:4px;font-weight:500}
 
-/* ── INNER TABS ── */
 .itabs{display:flex;gap:4px;background:var(--cream);border-radius:12px;padding:4px;width:fit-content;margin-bottom:26px}
 .itab{padding:8px 18px;border-radius:9px;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;border:none;background:transparent;transition:all .15s}
 .itab.active{background:var(--surface);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.09)}
 
-/* ── STRATEGY SECTION ── */
 .strategy-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 @media(max-width:700px){.strategy-grid{grid-template-columns:1fr}}
 .sq-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;transition:border-color .15s}
 .sq-card:focus-within{border-color:var(--teal)}
 .sq-cat{display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:5px;font-size:10px;font-weight:700;letter-spacing:.05em;margin-bottom:7px}
-.cat-main{background:#e0f7f7;color:#0e7070}
-.cat-awareness{background:#ede9fe;color:#5b21b6}
-.cat-hook{background:#fef9c3;color:#854d0e}
-.cat-conversion{background:var(--blush);color:#9d174d}
+.cat-main{background:#e0f7f7;color:#0e7070}.cat-awareness{background:#ede9fe;color:#5b21b6}
+.cat-hook{background:#fef9c3;color:#854d0e}.cat-conversion{background:var(--blush);color:#9d174d}
 .sq-q{font-size:12px;font-weight:600;color:#374151;margin-bottom:9px;line-height:1.5}
 
-/* ── ANGLES SECTION ── */
 .angles-list{display:flex;flex-direction:column;gap:12px}
 .angle-card{background:var(--surface);border:1.5px solid var(--border);border-radius:16px;overflow:hidden;transition:all .2s}
 .angle-card:hover{border-color:var(--teal);box-shadow:0 4px 16px rgba(42,191,191,.1)}
@@ -162,20 +127,18 @@ button,input,textarea,select{font-family:'Plus Jakarta Sans',sans-serif}
 .angle-card-body{padding:0 18px 16px;display:none}
 .angle-card-body.open{display:block}
 
-/* ── PIPELINE ── */
 .pipeline{display:flex;border-radius:12px;overflow:hidden;border:1px solid var(--border);margin-bottom:20px}
 .pip-btn{flex:1;padding:10px 6px;font-size:10px;font-weight:800;border:none;cursor:pointer;transition:all .15s;text-align:center;letter-spacing:.07em;text-transform:uppercase;border-right:1px solid rgba(0,0,0,.06)}
 .pip-btn:last-child{border-right:none}
 
-/* ── BRIEF ── */
 .brief-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media(max-width:640px){.brief-grid{grid-template-columns:1fr}}
 .brief-field{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:14px}
 .brief-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--subtle);margin-bottom:6px}
 .brief-val{font-size:13px;color:#374151;line-height:1.6;white-space:pre-wrap}
 .brief-empty{font-size:12px;color:var(--subtle);font-style:italic}
+.brief-date{font-size:11px;color:var(--subtle);font-weight:600;margin-bottom:16px;padding:8px 12px;background:var(--cream);border-radius:8px;display:inline-block}
 
-/* ── TASKS ── */
 .tasks-list{display:flex;flex-direction:column;gap:8px}
 .task-row{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:12px 14px;display:flex;gap:10px;align-items:flex-start;transition:all .15s}
 .task-row:hover{background:var(--surface);box-shadow:0 2px 8px rgba(0,0,0,.05)}
@@ -184,26 +147,28 @@ button,input,textarea,select{font-family:'Plus Jakarta Sans',sans-serif}
 .tbody{flex:1;min-width:0}
 .ttitle{font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px}
 .ttitle.done{text-decoration:line-through;color:var(--subtle)}
-.tmeta{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-top:4px}
-.task-tag{font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px}
+.tmeta{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-top:5px}
 .tactions{display:flex;gap:4px;opacity:0;transition:opacity .15s;flex-shrink:0}
 .task-row:hover .tactions{opacity:1}
 .icon-btn{width:26px;height:26px;border-radius:7px;border:none;background:var(--cream);color:var(--muted);cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;transition:all .15s}
 .icon-btn:hover{background:var(--border)}
-.icon-btn.del{background:#fee2e2;color:#dc2626}
-.icon-btn.del:hover{background:#fecaca}
+.icon-btn.del{background:#fee2e2;color:#dc2626}.icon-btn.del:hover{background:#fecaca}
 
-/* ── MODAL ── */
+.assignee-tag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:5px;background:var(--cream);color:var(--navy)}
+.assigned-tag{font-size:10px;color:var(--subtle);font-weight:500}
+.due-tag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:5px;background:rgba(42,191,191,0.12);color:#0e7070}
+.due-tag.soon{background:#fef9c3;color:#854d0e}
+.due-tag.overdue{background:#fee2e2;color:#dc2626}
+
 .modal-bg{position:fixed;inset:0;background:rgba(27,75,90,.45);display:flex;align-items:flex-start;justify-content:center;z-index:1000;padding:40px 16px;overflow-y:auto;backdrop-filter:blur(4px)}
 .modal{background:var(--surface);border-radius:22px;width:100%;max-width:680px;overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,.18)}
 .mhead{padding:22px 26px 18px;border-bottom:1px solid var(--cream);display:flex;align-items:center;justify-content:space-between}
 .mtitle{font-weight:800;font-size:17px;color:var(--text)}
-.mclose{width:30px;height:30px;border-radius:8px;border:none;background:var(--cream);color:var(--muted);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;line-height:1;transition:background .15s}
+.mclose{width:30px;height:30px;border-radius:8px;border:none;background:var(--cream);color:var(--muted);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:background .15s}
 .mclose:hover{background:var(--border)}
 .mbody{padding:22px 26px;max-height:68vh;overflow-y:auto}
 .mfoot{padding:14px 26px;border-top:1px solid var(--cream);display:flex;gap:8px;justify-content:flex-end}
 
-/* ── FORM ── */
 .frow{margin-bottom:14px}
 .flabel{font-size:12px;font-weight:700;color:#374151;margin-bottom:5px;display:block}
 .input{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;color:var(--text);outline:none;transition:border-color .15s;background:#fafaf8;line-height:1.5}
@@ -212,23 +177,22 @@ textarea.input{resize:vertical;min-height:76px;line-height:1.6}
 .stage-sel{display:flex;gap:5px;flex-wrap:wrap}
 .sstage{padding:5px 12px;border-radius:8px;font-size:11px;font-weight:700;border:1.5px solid var(--border);background:#fff;color:var(--muted);cursor:pointer;transition:all .15s}
 
-/* ── COLOR PICKER ── */
 .color-picker{display:flex;gap:8px;flex-wrap:wrap}
 .cpick{width:28px;height:28px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:all .15s;flex-shrink:0}
 .cpick.selected{border-color:var(--text);transform:scale(1.1)}
 
-/* ── EMPTY ── */
 .empty{text-align:center;padding:52px 24px;color:var(--subtle)}
 .empty-icon{font-size:32px;margin-bottom:12px}
 .empty-text{font-size:14px;font-weight:700;color:var(--muted);margin-bottom:4px}
 .empty-sub{font-size:12px}
 
-/* ── SECTION HEADER ── */
 .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;gap:12px}
 .section-desc{font-size:12px;color:var(--subtle);font-weight:500}
-
-/* ── DIVIDER ── */
 .divider{height:1px;background:var(--border);margin:20px 0}
+
+/* brief context banner in task modal */
+.brief-ctx{background:#e0f7f7;border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:12px;color:#0e7070;line-height:1.5}
+.brief-ctx strong{font-weight:700}
 </style>
 </head>
 <body>
@@ -240,7 +204,7 @@ textarea.input{resize:vertical;min-height:76px;line-height:1.6}
 
 <div id="app" style="display:none">
   <div class="top-bar">
-    <div class="tb-left">
+    <div style="display:flex;align-items:center">
       <span class="tb-brand">Kopari</span>
       <span class="tb-sep">|</span>
       <span class="tb-title">Creative Strategy Hub</span>
@@ -254,104 +218,119 @@ textarea.input{resize:vertical;min-height:76px;line-height:1.6}
 </div>
 
 <script>
-// ══ CONSTANTS ══
-const STAGES = ["Strategy","Brief","Assigned","In Production","Live"];
-const SC = {
-  "Strategy":      {bg:"#e0f7f7", color:"#0e7070"},
-  "Brief":         {bg:"#ede9fe", color:"#5b21b6"},
-  "Assigned":      {bg:"#fef9c3", color:"#854d0e"},
-  "In Production": {bg:"#F9D9E7", color:"#9d174d"},
-  "Live":          {bg:"#dcfce7", color:"#166534"}
+const STAGES=["Strategy","Brief","Assigned","In Production","Live"];
+const SC={
+  "Strategy":      {bg:"#e0f7f7",color:"#0e7070"},
+  "Brief":         {bg:"#ede9fe",color:"#5b21b6"},
+  "Assigned":      {bg:"#fef9c3",color:"#854d0e"},
+  "In Production": {bg:"#F9D9E7",color:"#9d174d"},
+  "Live":          {bg:"#dcfce7",color:"#166534"}
 };
-const ANGLE_COLORS = [
-  "#2ABFBF","#1B4B5A","#FF3EBF","#C8E000","#F5E642","#6B4A0B","#F9D9E7","#a78bfa","#fb923c","#34d399"
+const ANGLE_COLORS=["#2ABFBF","#1B4B5A","#FF3EBF","#C8E000","#F5E642","#6B4A0B","#F9D9E7","#a78bfa","#fb923c","#34d399"];
+const STRATEGY_QS=[
+  {id:"main_thing",    label:"What does this product do that nothing else does?",          cat:"main",       catLabel:"Main Thing"},
+  {id:"emotional",     label:"What's the emotional payoff, not just the functional one?",  cat:"main",       catLabel:"Main Thing"},
+  {id:"one_thing",     label:"If customers only remember ONE thing, what is it?",          cat:"main",       catLabel:"Main Thing"},
+  {id:"pain_point",    label:"What's the biggest pain point this product solves?",         cat:"awareness",  catLabel:"Awareness"},
+  {id:"value",         label:"What's the biggest value this product provides?",            cat:"awareness",  catLabel:"Awareness"},
+  {id:"stop_scroll",   label:"What would make someone stop scrolling?",                    cat:"hook",       catLabel:"Hook"},
+  {id:"objections",    label:"What objections might customers have that we can answer?",   cat:"conversion", catLabel:"Conversion"},
+  {id:"differentiator",label:"How is this different from competitors?",                    cat:"conversion", catLabel:"Conversion"},
 ];
 
-const STRATEGY_QS = [
-  {id:"main_thing",    label:"What does this product do that nothing else does?",        cat:"main",       catLabel:"Main Thing"},
-  {id:"emotional",     label:"What's the emotional payoff, not just the functional one?", cat:"main",       catLabel:"Main Thing"},
-  {id:"one_thing",     label:"If customers only remember ONE thing, what is it?",         cat:"main",       catLabel:"Main Thing"},
-  {id:"pain_point",    label:"What's the biggest pain point this product solves?",        cat:"awareness",  catLabel:"Awareness"},
-  {id:"value",         label:"What's the biggest value this product provides?",           cat:"awareness",  catLabel:"Awareness"},
-  {id:"stop_scroll",   label:"What would make someone stop scrolling?",                   cat:"hook",       catLabel:"Hook"},
-  {id:"objections",    label:"What objections might customers have that we can answer?",  cat:"conversion", catLabel:"Conversion"},
-  {id:"differentiator",label:"How is this different from competitors?",                   cat:"conversion", catLabel:"Conversion"},
-];
-
-// ══ STATE ══
-// view: "overview" | {type:"product", id} | {type:"angle", productId, angleId}
-let state = { products: {} };
-let view = { type:"overview" };
+let state={products:{}};
+let view={type:"overview"};
 let _db,_ref,_set,_on,saveTimer,listening=false;
-let detailTab = "strategy";
-let openAngles = {}; // angleId -> bool
+let detailTab="strategy";
+let openAngles={};
 
-// ══ FIREBASE ══
 function initFB(){
   _db=window.__fbDb;_ref=window.__fbRef;_set=window.__fbSet;_on=window.__fbOn;
-  if(listening) return; listening=true;
-  _on(_ref(_db,"kopari_strategy"), snap=>{
+  if(listening)return;listening=true;
+  _on(_ref(_db,"kopari_strategy"),snap=>{
     const val=snap.val();
-    if(val?.products) state.products=val.products;
+    if(val?.products)state.products=val.products;
     document.getElementById("loading").style.display="none";
     document.getElementById("app").style.display="block";
     render();
-    document.getElementById("syncDot").style.background="#6ee7b7";
-    document.getElementById("syncTxt").textContent="Live ✓";
+    setSyncStatus("live");
   });
 }
+
 function save(){
+  setSyncStatus("saving");
   clearTimeout(saveTimer);
-  saveTimer=setTimeout(()=>_set(_ref(_db,"kopari_strategy"),state),700);
+  saveTimer=setTimeout(()=>{
+    _set(_ref(_db,"kopari_strategy"),state);
+    setTimeout(()=>setSyncStatus("live"),600);
+  },500);
 }
 
-// ══ UTILS ══
+function setSyncStatus(s){
+  const dot=document.getElementById("syncDot");
+  const txt=document.getElementById("syncTxt");
+  if(!dot||!txt)return;
+  if(s==="live"){dot.style.background="#6ee7b7";txt.textContent="Live ✓";}
+  else if(s==="saving"){dot.style.background="#f59e0b";txt.textContent="Saving…";}
+  else{dot.style.background="#f59e0b";txt.textContent="Connecting…";}
+}
+
 function genId(){return Date.now().toString(36)+Math.random().toString(36).slice(2,5);}
 function h(tag,attrs={},...kids){
   const el=document.createElement(tag);
-  for(const [k,v] of Object.entries(attrs)){
-    if(k==="class") el.className=v;
-    else if(k.startsWith("on")) el[k]=v;
+  for(const[k,v]of Object.entries(attrs)){
+    if(k==="class")el.className=v;
+    else if(k.startsWith("on"))el[k]=v;
     else el.setAttribute(k,v);
   }
   kids.flat().forEach(c=>{if(c==null)return;el.appendChild(typeof c==="string"?document.createTextNode(c):c);});
   return el;
 }
 function css(el,s){Object.assign(el.style,s);return el;}
-function stageCfg(s){return SC[s]||SC["Strategy"];}
+function sc(s){return SC[s]||SC["Strategy"];}
 
-// ══ RENDER ══
+function fmtDate(ts){
+  if(!ts)return"";
+  return new Date(ts).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
+}
+function dueCls(dateStr){
+  if(!dateStr)return"";
+  const due=new Date(dateStr+"T00:00:00");
+  const today=new Date();today.setHours(0,0,0,0);
+  const diff=Math.round((due-today)/86400000);
+  if(diff<0)return"overdue";
+  if(diff<=3)return"soon";
+  return"";
+}
+
 function render(){
   const page=document.getElementById("mainPage");
   const sy=window.scrollY;
   page.innerHTML="";
-  if(view.type==="overview") page.appendChild(buildOverview());
+  if(view.type==="overview")page.appendChild(buildOverview());
   else if(view.type==="product"){
     const p=state.products[view.id];
-    if(p) page.appendChild(buildProductDetail(view.id,p));
+    if(p)page.appendChild(buildProductDetail(view.id,p));
     else{view={type:"overview"};page.appendChild(buildOverview());}
   }
   window.scrollTo(0,sy);
 }
 
-// ══ BREADCRUMB ══
 function buildBreadcrumb(items){
   const bc=h("div",{class:"breadcrumb"});
   items.forEach((item,i)=>{
     const el=h("span",{class:"bc-item"+(i===items.length-1?" active":"")},item.label);
-    if(item.onClick) el.onclick=item.onClick;
+    if(item.onClick)el.onclick=item.onClick;
     bc.appendChild(el);
-    if(i<items.length-1) bc.appendChild(h("span",{class:"bc-sep"},"›"));
+    if(i<items.length-1)bc.appendChild(h("span",{class:"bc-sep"},"›"));
   });
   return bc;
 }
 
-// ══ OVERVIEW ══
 function buildOverview(){
   const frag=document.createDocumentFragment();
   const prods=Object.entries(state.products);
 
-  // Header
   const hdr=h("div",{class:"page-header"});
   const tb=h("div");
   tb.appendChild(h("div",{class:"page-title"},"Creative Strategy"));
@@ -360,111 +339,77 @@ function buildOverview(){
   hdr.appendChild(h("button",{class:"btn btn-navy",onclick:()=>openProductModal()},"+ New Product"));
   frag.appendChild(hdr);
 
-  // Stats
   const stats=h("div",{class:"stats-row"});
   const totalAngles=prods.reduce((n,[,p])=>n+Object.keys(p.angles||{}).length,0);
   const liveAngles=prods.reduce((n,[,p])=>n+Object.values(p.angles||{}).filter(a=>a.stage==="Live").length,0);
   const inProd=prods.reduce((n,[,p])=>n+Object.values(p.angles||{}).filter(a=>a.stage==="In Production").length,0);
-  stats.appendChild(mkStat(prods.length,"Products",""));
-  stats.appendChild(mkStat(totalAngles,"Total Angles",""));
-  stats.appendChild(mkStat(inProd,"In Production","highlight"));
-  stats.appendChild(mkStat(liveAngles,"Live",""));
+  [["Products",prods.length,""],["Total Angles",totalAngles,""],["In Production",inProd,"highlight"],["Live",liveAngles,""]].forEach(([label,n,cls])=>{
+    const c=h("div",{class:"stat"+(cls?" "+cls:"")});
+    c.appendChild(h("div",{class:"stat-num"},String(n)));
+    c.appendChild(h("div",{class:"stat-label"},label));
+    stats.appendChild(c);
+  });
   frag.appendChild(stats);
 
-  // Filter
   const filterRow=h("div",{class:"filter-row"});
   const ftabs=h("div",{class:"filter-tabs"});
-  let activeF="All";
   const grid=h("div",{class:"products-grid"});
 
   function applyFilter(f){
-    activeF=f;
     ftabs.querySelectorAll(".ftab").forEach(t=>t.classList.remove("active"));
     ftabs.querySelector(`[data-f="${f}"]`).classList.add("active");
     grid.innerHTML="";
     let filtered=prods;
-    if(f!=="All") filtered=prods.filter(([,p])=>Object.values(p.angles||{}).some(a=>a.stage===f));
+    if(f!=="All")filtered=prods.filter(([,p])=>Object.values(p.angles||{}).some(a=>a.stage===f));
     if(!filtered.length){
-      grid.appendChild(css(h("div",{class:"empty",style:"grid-column:1/-1"},
-        h("div",{class:"empty-icon"},"✦"),
-        h("div",{class:"empty-text"},f==="All"?"No products yet":"None in "+f),
-      ),{}));
-    } else {
-      filtered.forEach(([id,p])=>grid.appendChild(buildPcard(id,p)));
-    }
+      grid.appendChild(css(h("div",{class:"empty",style:"grid-column:1/-1"},h("div",{class:"empty-icon"},"✦"),h("div",{class:"empty-text"},f==="All"?"No products yet":"None in "+f)),{}));
+    }else{filtered.forEach(([id,p])=>grid.appendChild(buildPcard(id,p)));}
   }
 
   ["All",...STAGES].forEach(f=>{
     const t=h("button",{class:"ftab"+(f==="All"?" active":"")},f);
-    t.dataset.f=f;
-    t.onclick=()=>applyFilter(f);
-    ftabs.appendChild(t);
+    t.dataset.f=f;t.onclick=()=>applyFilter(f);ftabs.appendChild(t);
   });
-  filterRow.appendChild(ftabs);
-  frag.appendChild(filterRow);
-
-  applyFilter("All");
-  frag.appendChild(grid);
+  filterRow.appendChild(ftabs);frag.appendChild(filterRow);
+  applyFilter("All");frag.appendChild(grid);
   return frag;
-}
-
-function mkStat(n,label,cls){
-  const c=h("div",{class:"stat"+(cls?" "+cls:"")});
-  c.appendChild(h("div",{class:"stat-num"},String(n)));
-  c.appendChild(h("div",{class:"stat-label"},label));
-  return c;
 }
 
 function buildPcard(id,p){
   const angles=Object.entries(p.angles||{});
   const card=h("div",{class:"pcard",onclick:()=>{view={type:"product",id};detailTab="strategy";render();}});
-
-  // Top
   const top=h("div",{class:"pcard-top"});
   top.appendChild(h("div",{class:"pcard-name"},p.name||"Untitled"));
   top.appendChild(h("div",{class:"angle-count-pill"},angles.length+" angle"+(angles.length===1?"":"s")));
   card.appendChild(top);
-
-  // Body
   const body=h("div",{class:"pcard-body"});
   const preview=p.strategy?.main_thing||p.strategy?.one_thing||"";
   body.appendChild(css(h("div",{class:"pcard-preview"},preview||"No strategy notes yet"),{color:preview?"":"var(--subtle)",fontStyle:preview?"":"italic"}));
-
-  // Angle chips
   if(angles.length){
     const chips=h("div",{class:"pcard-angles"});
     angles.slice(0,4).forEach(([,a])=>{
-      const sc=stageCfg(a.stage||"Strategy");
-      const chip=css(h("div",{class:"angle-chip"},a.name||"Untitled"),{borderColor:a.color||"var(--border)",color:a.color||"var(--muted)",background:a.color?(a.color+"18"):"var(--cream)"});
-      chips.appendChild(chip);
+      chips.appendChild(css(h("div",{class:"angle-chip"},a.name||"Untitled"),{borderColor:a.color||"var(--border)",color:a.color||"var(--muted)",background:a.color?(a.color+"18"):"var(--cream)"}));
     });
-    if(angles.length>4) chips.appendChild(css(h("div",{class:"angle-chip"},`+${angles.length-4} more`),{borderColor:"var(--border)",color:"var(--muted)"}));
+    if(angles.length>4)chips.appendChild(css(h("div",{class:"angle-chip"},`+${angles.length-4} more`),{borderColor:"var(--border)",color:"var(--muted)"}));
     body.appendChild(chips);
   }
-
   const footer=h("div",{class:"pcard-footer"});
-  const tasks=angles.reduce((n,[,a])=>n+(a.tasks?.length||0),0);
-  const done=angles.reduce((n,[,a])=>n+(a.tasks?.filter(t=>t.done).length||0),0);
-  footer.appendChild(css(h("span",{},tasks>0?`✓ ${done}/${tasks} tasks`:"No tasks"),{fontSize:"11px",color:"var(--subtle)",fontWeight:"500"}));
+  const allTasks=angles.reduce((arr,[,a])=>arr.concat(a.tasks||[]),[]);
+  const done=allTasks.filter(t=>t.done).length;
+  footer.appendChild(css(h("span",{},allTasks.length>0?`✓ ${done}/${allTasks.length} tasks`:"No tasks"),{fontSize:"11px",color:"var(--subtle)",fontWeight:"500"}));
   const acts=h("div",{class:"pcard-actions"});
   acts.appendChild(h("button",{class:"btn btn-ghost btn-xs",onclick:e=>{e.stopPropagation();openProductModal(id,p);}},"Edit"));
   acts.appendChild(h("button",{class:"btn btn-danger btn-xs",onclick:e=>{e.stopPropagation();if(confirm("Delete "+p.name+"?")){delete state.products[id];save();render();}}},"✕"));
-  footer.appendChild(acts);
-  body.appendChild(footer);
-  card.appendChild(body);
+  footer.appendChild(acts);body.appendChild(footer);card.appendChild(body);
   return card;
 }
 
-// ══ PRODUCT DETAIL ══
 function buildProductDetail(id,p){
   const frag=document.createDocumentFragment();
-
   frag.appendChild(buildBreadcrumb([
     {label:"All Products",onClick:()=>{view={type:"overview"};render();}},
     {label:p.name||"Untitled"}
   ]));
-
-  // Header
   const hdr=h("div",{class:"detail-header"});
   const tb=h("div",{style:"flex:1"});
   tb.appendChild(h("div",{class:"detail-title"},p.name||"Untitled"));
@@ -477,37 +422,30 @@ function buildProductDetail(id,p){
   ));
   frag.appendChild(hdr);
 
-  // Inner tabs
   const itabs=h("div",{class:"itabs"});
   const tabDefs=[
     {id:"strategy",label:"📋 Strategy Foundation"},
     {id:"angles",  label:"🎯 Angles"+(angles.length?" ("+angles.length+")":"")},
   ];
   const content=h("div");
-
   function showTab(tid){
     detailTab=tid;
     itabs.querySelectorAll(".itab").forEach((t,i)=>t.classList.toggle("active",tabDefs[i].id===tid));
     content.innerHTML="";
-    if(tid==="strategy") content.appendChild(buildStrategySection(id,p));
-    if(tid==="angles")   content.appendChild(buildAnglesSection(id,p));
+    if(tid==="strategy")content.appendChild(buildStrategySection(id,p));
+    if(tid==="angles")content.appendChild(buildAnglesSection(id,p));
   }
-
-  tabDefs.forEach((t,i)=>{
+  tabDefs.forEach(t=>{
     itabs.appendChild(h("button",{class:"itab"+(t.id===detailTab?" active":""),onclick:()=>showTab(t.id)},t.label));
   });
-  frag.appendChild(itabs);
-  showTab(detailTab);
-  frag.appendChild(content);
+  frag.appendChild(itabs);showTab(detailTab);frag.appendChild(content);
   return frag;
 }
 
-// ── Strategy Foundation ──
 function buildStrategySection(id,p){
   const wrap=h("div");
   wrap.appendChild(h("div",{class:"section-header"},
-    css(h("div",{class:"section-desc"},"Answer these once per product. Your angles will branch off from these foundations."),{}),
-    h("div")
+    css(h("div",{class:"section-desc"},"Answer these once per product. Your angles branch off from these foundations."),{}),h("div")
   ));
   const catCls={main:"cat-main",awareness:"cat-awareness",hook:"cat-hook",conversion:"cat-conversion"};
   const grid=h("div",{class:"strategy-grid"});
@@ -516,122 +454,90 @@ function buildStrategySection(id,p){
     card.appendChild(h("span",{class:"sq-cat "+catCls[q.cat]},q.catLabel));
     card.appendChild(h("div",{class:"sq-q"},q.label));
     const ta=h("textarea",{class:"input",placeholder:"Type your answer…"});
-    ta.style.minHeight="70px";
-    ta.value=p.strategy?.[q.id]||"";
-    ta.oninput=e=>{
-      if(!state.products[id].strategy) state.products[id].strategy={};
-      state.products[id].strategy[q.id]=e.target.value;
-      save();
-    };
-    card.appendChild(ta);
-    grid.appendChild(card);
+    ta.style.minHeight="70px";ta.value=p.strategy?.[q.id]||"";
+    ta.oninput=e=>{if(!state.products[id].strategy)state.products[id].strategy={};state.products[id].strategy[q.id]=e.target.value;save();};
+    card.appendChild(ta);grid.appendChild(card);
   });
-  wrap.appendChild(grid);
-  return wrap;
+  wrap.appendChild(grid);return wrap;
 }
 
-// ── Angles Section ──
 function buildAnglesSection(id,p){
   const wrap=h("div");
   const shdr=h("div",{class:"section-header"});
   shdr.appendChild(css(h("div",{class:"section-desc"},"Each angle branches off from your strategy and gets its own brief and tasks."),{}));
   shdr.appendChild(h("button",{class:"btn btn-navy btn-sm",onclick:()=>openAngleModal(id,p,null)},"+ New Angle"));
   wrap.appendChild(shdr);
-
   const angles=Object.entries(p.angles||{});
   if(!angles.length){
     const empty=h("div",{class:"empty"});
     empty.appendChild(h("div",{class:"empty-icon"},"🎯"));
     empty.appendChild(h("div",{class:"empty-text"},"No angles yet"));
     empty.appendChild(h("div",{class:"empty-sub"},"Create your first angle from the strategy above"));
-    wrap.appendChild(empty);
-    return wrap;
+    wrap.appendChild(empty);return wrap;
   }
-
   const list=h("div",{class:"angles-list"});
-  angles.forEach(([aid,angle])=>{
-    list.appendChild(buildAngleCard(id,p,aid,angle));
-  });
-  wrap.appendChild(list);
-  return wrap;
+  angles.forEach(([aid,angle])=>list.appendChild(buildAngleCard(id,p,aid,angle)));
+  wrap.appendChild(list);return wrap;
 }
 
 function buildAngleCard(pid,p,aid,angle){
   const isOpen=!!openAngles[aid];
-  const sc=stageCfg(angle.stage||"Strategy");
+  const cfg=sc(angle.stage||"Strategy");
   const tasks=angle.tasks||[];
   const done=tasks.filter(t=>t.done).length;
-
   const card=h("div",{class:"angle-card"});
 
-  // Top row
   const top=h("div",{class:"angle-card-top",onclick:()=>{openAngles[aid]=!openAngles[aid];render();}});
   top.appendChild(css(h("div",{class:"angle-color-dot"}),{background:angle.color||"var(--teal)"}));
   top.appendChild(h("div",{class:"angle-name"},angle.name||"Untitled Angle"));
-
   const meta=h("div",{class:"angle-meta"});
-  meta.appendChild(css(h("span",{class:"stage-pill"},angle.stage||"Strategy"),{background:sc.bg,color:sc.color}));
-  if(tasks.length) meta.appendChild(css(h("span",{},`${done}/${tasks.length} tasks`),{fontSize:"11px",color:"var(--subtle)",fontWeight:"500"}));
+  meta.appendChild(css(h("span",{class:"stage-pill"},angle.stage||"Strategy"),{background:cfg.bg,color:cfg.color}));
+  if(tasks.length)meta.appendChild(css(h("span",{},`${done}/${tasks.length} tasks`),{fontSize:"11px",color:"var(--subtle)",fontWeight:"500"}));
   top.appendChild(meta);
-
   const acts=h("div",{class:"angle-card-actions"});
   acts.appendChild(h("button",{class:"icon-btn",onclick:e=>{e.stopPropagation();openAngleModal(pid,p,aid,angle);}},"✎"));
   acts.appendChild(h("button",{class:"icon-btn del",onclick:e=>{e.stopPropagation();if(confirm("Delete angle?")){delete state.products[pid].angles[aid];save();render();}}},"✕"));
   top.appendChild(acts);
-
-  // Arrow
   top.appendChild(css(h("span",{},isOpen?"▲":"▼"),{fontSize:"11px",color:"var(--subtle)",marginLeft:"4px",flexShrink:"0"}));
   card.appendChild(top);
 
-  // Expanded body
   const body=h("div",{class:"angle-card-body"+(isOpen?" open":"")});
-
   if(angle.sourceQuestion){
     const sq=STRATEGY_QS.find(q=>q.id===angle.sourceQuestion);
     const srcNote=css(h("div",{}),{background:"var(--cream)",borderRadius:"10px",padding:"10px 14px",marginBottom:"16px",fontSize:"12px",color:"var(--muted)"});
-    srcNote.appendChild(css(h("span",{},`Branched from: `),{fontWeight:"700",color:"var(--navy)"}));
-    srcNote.appendChild(document.createTextNode((sq?.label||angle.sourceQuestion)));
-    if(angle.sourceAnswer) srcNote.appendChild(css(h("div",{},`"${angle.sourceAnswer}"`),{marginTop:"4px",fontStyle:"italic",color:"var(--text)"}));
+    srcNote.appendChild(css(h("span",{},"Branched from: "),{fontWeight:"700",color:"var(--navy)"}));
+    srcNote.appendChild(document.createTextNode(sq?.label||angle.sourceQuestion));
+    if(angle.sourceAnswer)srcNote.appendChild(css(h("div",{},`"${angle.sourceAnswer}"`),{marginTop:"4px",fontStyle:"italic",color:"var(--text)"}));
     body.appendChild(srcNote);
   }
 
-  // Pipeline
   const pipeline=h("div",{class:"pipeline"});
   const curIdx=STAGES.indexOf(angle.stage||"Strategy");
   STAGES.forEach((s,i)=>{
-    const sc2=stageCfg(s);
-    const isActive=i===curIdx, isDone=i<curIdx;
-    const btn=css(h("button",{class:"pip-btn",onclick:e=>{e.stopPropagation();state.products[pid].angles[aid].stage=s;save();render();}},s),{
-      background:isActive?"var(--navy)":isDone?sc2.bg:"var(--bg)",
-      color:isActive?"#fff":isDone?sc2.color:"var(--subtle)",
-    });
-    pipeline.appendChild(btn);
+    const c2=sc(s);const isActive=i===curIdx,isDone=i<curIdx;
+    pipeline.appendChild(css(h("button",{class:"pip-btn",onclick:e=>{e.stopPropagation();state.products[pid].angles[aid].stage=s;save();render();}},s),{
+      background:isActive?"var(--navy)":isDone?c2.bg:"var(--bg)",
+      color:isActive?"#fff":isDone?c2.color:"var(--subtle)",
+    }));
   });
   body.appendChild(pipeline);
 
-  // Brief + Tasks tabs
   const btabs=h("div",{class:"itabs",style:"margin-bottom:16px"});
   let activeTab=angle._openTab||"brief";
   const bcontent=h("div");
-
   function showBT(t){
     angle._openTab=t;
     btabs.querySelectorAll(".itab").forEach((b,i)=>b.classList.toggle("active",["brief","tasks"][i]===t));
     bcontent.innerHTML="";
-    if(t==="brief") bcontent.appendChild(buildAngleBrief(pid,aid,angle));
-    if(t==="tasks") bcontent.appendChild(buildAngleTasks(pid,aid,angle));
+    if(t==="brief")bcontent.appendChild(buildAngleBrief(pid,aid,angle));
+    if(t==="tasks")bcontent.appendChild(buildAngleTasks(pid,aid,angle));
   }
-
   btabs.appendChild(h("button",{class:"itab"+(activeTab==="brief"?" active":""),onclick:()=>showBT("brief")},"📄 Brief"));
   btabs.appendChild(h("button",{class:"itab"+(activeTab==="tasks"?" active":""),onclick:()=>showBT("tasks")},"✅ Tasks"+(tasks.length?" ("+tasks.length+")":"")));
-  body.appendChild(btabs);
-  showBT(activeTab);
-  body.appendChild(bcontent);
-  card.appendChild(body);
-  return card;
+  body.appendChild(btabs);showBT(activeTab);body.appendChild(bcontent);
+  card.appendChild(body);return card;
 }
 
-// ── Angle Brief ──
 function buildAngleBrief(pid,aid,angle){
   const wrap=h("div");
   const shdr=h("div",{class:"section-header"});
@@ -639,16 +545,20 @@ function buildAngleBrief(pid,aid,angle){
   shdr.appendChild(h("button",{class:"btn btn-navy btn-xs",onclick:()=>openBriefModal(pid,aid,angle)},"Edit Brief"));
   wrap.appendChild(shdr);
   const brief=angle.brief||{};
+  if(brief.createdAt){
+    wrap.appendChild(h("div",{class:"brief-date"},"📅 Briefed "+fmtDate(brief.createdAt)));
+  }
   const fields=[
-    {key:"objective", label:"Objective"},
-    {key:"audience",  label:"Target Audience"},
-    {key:"formats",   label:"Content Formats"},
-    {key:"hooks",     label:"Hook Ideas"},
-    {key:"dos",       label:"Do's"},
-    {key:"donts",     label:"Don'ts"},
-    {key:"references",label:"References / Inspo"},
-    {key:"deadline",  label:"Deadline"},
+    {key:"objective",label:"Objective"},
+    {key:"formats",  label:"Content Formats"},
+    {key:"hooks",    label:"Hook Ideas"},
+    {key:"copy",     label:"Copy Notes"},
   ];
+  const hasContent=fields.some(f=>brief[f.key]?.trim());
+  if(!hasContent){
+    wrap.appendChild(css(h("div",{class:"empty",style:"padding:24px"},h("div",{class:"empty-text"},"No brief yet — click Edit Brief to get started")),{}));
+    return wrap;
+  }
   const grid=h("div",{class:"brief-grid"});
   fields.forEach(f=>{
     const c=h("div",{class:"brief-field"});
@@ -656,15 +566,13 @@ function buildAngleBrief(pid,aid,angle){
     c.appendChild(brief[f.key]?h("div",{class:"brief-val"},brief[f.key]):h("div",{class:"brief-empty"},"Not filled in yet"));
     grid.appendChild(c);
   });
-  wrap.appendChild(grid);
-  return wrap;
+  wrap.appendChild(grid);return wrap;
 }
 
-// ── Angle Tasks ──
 function buildAngleTasks(pid,aid,angle){
   const wrap=h("div");
   const shdr=h("div",{class:"section-header"});
-  shdr.appendChild(h("div",{class:"section-desc"},"Production tasks for this angle."));
+  shdr.appendChild(h("div",{class:"section-desc"},"Tasks linked to this angle's brief."));
   shdr.appendChild(h("button",{class:"btn btn-navy btn-xs",onclick:()=>openTaskModal(pid,aid,angle,null)},"+ Add Task"));
   wrap.appendChild(shdr);
   const tasks=angle.tasks||[];
@@ -676,236 +584,197 @@ function buildAngleTasks(pid,aid,angle){
   tasks.forEach((t,i)=>{
     const row=h("div",{class:"task-row"});
     const chk=h("div",{class:"tcheck"+(t.done?" done":""),onclick:()=>{state.products[pid].angles[aid].tasks[i].done=!t.done;save();render();}});
-    if(t.done) chk.textContent="✓";
+    if(t.done)chk.textContent="✓";
     row.appendChild(chk);
     const body=h("div",{class:"tbody"});
     body.appendChild(h("div",{class:"ttitle"+(t.done?" done":"")},t.title||""));
     const meta=h("div",{class:"tmeta"});
-    if(t.assignee) meta.appendChild(css(h("span",{},"👤 "+t.assignee),{fontSize:"11px",color:"var(--muted)",fontWeight:"500"}));
-    if(t.due)      meta.appendChild(css(h("span",{},"📅 "+t.due),{fontSize:"11px",color:"var(--subtle)"}));
-    if(t.stage){const sc=stageCfg(t.stage);meta.appendChild(css(h("span",{class:"task-tag"},t.stage),{background:sc.bg,color:sc.color}));}
-    if(meta.children.length) body.appendChild(meta);
-    if(t.notes) body.appendChild(css(h("div",{},t.notes),{fontSize:"11px",color:"var(--subtle)",marginTop:"4px",lineHeight:"1.5"}));
+    if(t.assignee)meta.appendChild(h("span",{class:"assignee-tag"},"👤 "+t.assignee));
+    if(t.assignedAt)meta.appendChild(h("span",{class:"assigned-tag"},"assigned "+fmtDate(t.assignedAt)));
+    if(t.due){
+      const dc=dueCls(t.due);
+      meta.appendChild(h("span",{class:"due-tag"+(dc?" "+dc:"")},
+        dc==="overdue"?"⚠ overdue: "+t.due:dc==="soon"?"⏰ due soon: "+t.due:"📅 due "+t.due
+      ));
+    }
+    if(meta.children.length)body.appendChild(meta);
     row.appendChild(body);
     const acts=h("div",{class:"tactions"});
     acts.appendChild(h("button",{class:"icon-btn",onclick:()=>openTaskModal(pid,aid,angle,i)},"✎"));
     acts.appendChild(h("button",{class:"icon-btn del",onclick:()=>{state.products[pid].angles[aid].tasks.splice(i,1);save();render();}},"✕"));
-    row.appendChild(acts);
-    list.appendChild(row);
+    row.appendChild(acts);list.appendChild(row);
   });
-  wrap.appendChild(list);
-  return wrap;
+  wrap.appendChild(list);return wrap;
 }
 
 // ══ MODALS ══
 
 function openProductModal(id=null,p=null){
   const isEdit=!!id;
-  const bg=mkBg();
-  const modal=h("div",{class:"modal"});
-  const mh=mkHead(isEdit?"Edit Product":"New Product",()=>bg.remove());
-  modal.appendChild(mh);
+  const bg=mkBg();const modal=h("div",{class:"modal"});
+  modal.appendChild(mkHead(isEdit?"Edit Product":"New Product",()=>bg.remove()));
   const mb=h("div",{class:"mbody"});
-  const nr=h("div",{class:"frow"});
-  nr.appendChild(h("label",{class:"flabel"},"Product Name"));
-  const ni=h("input",{class:"input",placeholder:"e.g. Sun Veil Illuminator",value:p?.name||""});
-  nr.appendChild(ni); mb.appendChild(nr);
-  modal.appendChild(mb);
+  const nr=h("div",{class:"frow"});nr.appendChild(h("label",{class:"flabel"},"Product Name"));
+  const ni=h("input",{class:"input",placeholder:"e.g. Sun Veil Illuminating Elixir SPF 38",value:p?.name||""});
+  nr.appendChild(ni);mb.appendChild(nr);modal.appendChild(mb);
   const mf=h("div",{class:"mfoot"});
   mf.appendChild(h("button",{class:"btn btn-ghost",onclick:()=>bg.remove()},"Cancel"));
   mf.appendChild(h("button",{class:"btn btn-navy",onclick:()=>{
-    const name=ni.value.trim(); if(!name) return;
-    if(isEdit){state.products[id].name=name;}
+    const name=ni.value.trim();if(!name)return;
+    if(isEdit)state.products[id].name=name;
     else{const nid=genId();state.products[nid]={name,strategy:{},angles:{}};}
     save();render();bg.remove();
   }},isEdit?"Save Changes":"Create Product"));
-  modal.appendChild(mf);
-  bg.appendChild(modal); document.body.appendChild(bg);
+  modal.appendChild(mf);bg.appendChild(modal);document.body.appendChild(bg);
   setTimeout(()=>ni.focus(),50);
 }
 
 function openAngleModal(pid,p,aid=null,angle=null){
   const isEdit=!!aid;
-  const bg=mkBg();
-  const modal=h("div",{class:"modal"});
+  const bg=mkBg();const modal=h("div",{class:"modal"});
   modal.appendChild(mkHead(isEdit?"Edit Angle":"New Angle",()=>bg.remove()));
   const mb=h("div",{class:"mbody"});
 
-  // Name
-  const nr=h("div",{class:"frow"});
-  nr.appendChild(h("label",{class:"flabel"},"Angle Name"));
-  const ni=h("input",{class:"input",placeholder:"e.g. Serum-like texture angle, Confidence angle…",value:angle?.name||""});
-  nr.appendChild(ni); mb.appendChild(nr);
+  const nr=h("div",{class:"frow"});nr.appendChild(h("label",{class:"flabel"},"Angle Name"));
+  const ni=h("input",{class:"input",placeholder:"e.g. Confidence angle, Routine swap angle…",value:angle?.name||""});
+  nr.appendChild(ni);mb.appendChild(nr);
 
-  // Color
-  const cr=h("div",{class:"frow"});
-  cr.appendChild(h("label",{class:"flabel"},"Color"));
+  const cr=h("div",{class:"frow"});cr.appendChild(h("label",{class:"flabel"},"Color"));
   let selColor=angle?.color||ANGLE_COLORS[0];
   const cp=h("div",{class:"color-picker"});
   ANGLE_COLORS.forEach(c=>{
-    const dot=css(h("div",{class:"cpick"+(selColor===c?" selected":""),onclick:()=>{
-      selColor=c;
-      cp.querySelectorAll(".cpick").forEach(d=>d.classList.remove("selected"));
-      dot.classList.add("selected");
-    }}),{background:c});
+    const dot=css(h("div",{class:"cpick"+(selColor===c?" selected":""),onclick:()=>{selColor=c;cp.querySelectorAll(".cpick").forEach(d=>d.classList.remove("selected"));dot.classList.add("selected");}},{background:c}),{background:c});
     cp.appendChild(dot);
   });
-  cr.appendChild(cp); mb.appendChild(cr);
+  cr.appendChild(cp);mb.appendChild(cr);
 
-  // Stage
-  const sr=h("div",{class:"frow"});
-  sr.appendChild(h("label",{class:"flabel"},"Current Stage"));
+  const sr=h("div",{class:"frow"});sr.appendChild(h("label",{class:"flabel"},"Current Stage"));
   let selStage=angle?.stage||"Strategy";
   const ss=h("div",{class:"stage-sel"});
   STAGES.forEach(s=>{
-    const sc=stageCfg(s);
-    const btn=h("button",{class:"sstage",onclick:()=>{
-      selStage=s;
-      ss.querySelectorAll(".sstage").forEach(b=>{b.style.background="";b.style.borderColor="";b.style.color="";});
-      Object.assign(btn.style,{background:sc.bg,borderColor:sc.color,color:sc.color});
-    }},s);
-    if(selStage===s) Object.assign(btn.style,{background:sc.bg,borderColor:sc.color,color:sc.color});
+    const cfg=sc(s);
+    const btn=h("button",{class:"sstage",onclick:()=>{selStage=s;ss.querySelectorAll(".sstage").forEach(b=>{b.style.background="";b.style.borderColor="";b.style.color="";});Object.assign(btn.style,{background:cfg.bg,borderColor:cfg.color,color:cfg.color});}},s);
+    if(selStage===s)Object.assign(btn.style,{background:cfg.bg,borderColor:cfg.color,color:cfg.color});
     ss.appendChild(btn);
   });
-  sr.appendChild(ss); mb.appendChild(sr);
+  sr.appendChild(ss);mb.appendChild(sr);
 
-  // Source strategy question
   const strat=p.strategy||{};
   const answeredQs=STRATEGY_QS.filter(q=>strat[q.id]?.trim());
+  let selQ=angle?.sourceQuestion||"";
   if(answeredQs.length){
     const qr=h("div",{class:"frow"});
     qr.appendChild(h("label",{class:"flabel"},"Branch from Strategy Answer (optional)"));
-    qr.appendChild(css(h("div",{},`Which strategy answer inspired this angle?`),{fontSize:"12px",color:"var(--subtle)",marginBottom:"8px"}));
-    let selQ=angle?.sourceQuestion||"";
+    qr.appendChild(css(h("div",{},"Which strategy answer inspired this angle?"),{fontSize:"12px",color:"var(--subtle)",marginBottom:"8px"}));
     const qlist=h("div",{style:"display:flex;flex-direction:column;gap:6px"});
     answeredQs.forEach(q=>{
-      const row=h("div",{style:`padding:10px 12px;border-radius:10px;border:1.5px solid ${selQ===q.id?"var(--teal)":"var(--border)"};cursor:pointer;transition:all .15s;background:${selQ===q.id?"#e0f7f7":"var(--bg)"}`});
+      const row=css(h("div",{}),{padding:"10px 12px",borderRadius:"10px",border:"1.5px solid "+(selQ===q.id?"var(--teal)":"var(--border)"),cursor:"pointer",transition:"all .15s",background:selQ===q.id?"#e0f7f7":"var(--bg)"});
       row.appendChild(css(h("div",{},q.label),{fontSize:"12px",fontWeight:"600",color:"var(--text)",marginBottom:"4px"}));
-      row.appendChild(css(h("div",{},`"${strat[q.id]}"`),{fontSize:"11px",color:"var(--muted)",lineHeight:"1.5",display:"-webkit-box","-webkit-line-clamp":"2","-webkit-box-orient":"vertical",overflow:"hidden"}));
+      row.appendChild(css(h("div",{},`"${strat[q.id]}"`),{fontSize:"11px",color:"var(--muted)",lineHeight:"1.5",overflow:"hidden"}));
+      row.dataset.qid=q.id;
       row.onclick=()=>{
         selQ=selQ===q.id?"":q.id;
-        qlist.querySelectorAll("div[style*='padding:10px']").forEach((r,i)=>{
-          const isActive=answeredQs[i].id===selQ;
-          r.style.borderColor=isActive?"var(--teal)":"var(--border)";
-          r.style.background=isActive?"#e0f7f7":"var(--bg)";
-        });
+        qlist.querySelectorAll("[data-qid]").forEach(r=>{const a=r.dataset.qid===selQ;r.style.borderColor=a?"var(--teal)":"var(--border)";r.style.background=a?"#e0f7f7":"var(--bg)";});
       };
       qlist.appendChild(row);
     });
-    qr.appendChild(qlist); mb.appendChild(qr);
-
-    modal.querySelector(".mfoot") // save will capture selQ in closure
-    // patch save to use selQ
-    const origSave=modal._doSave;
-    modal._selQ=()=>selQ;
-    modal._strat=()=>strat;
+    qr.appendChild(qlist);mb.appendChild(qr);
   }
 
   modal.appendChild(mb);
   const mf=h("div",{class:"mfoot"});
   mf.appendChild(h("button",{class:"btn btn-ghost",onclick:()=>bg.remove()},"Cancel"));
   mf.appendChild(h("button",{class:"btn btn-navy",onclick:()=>{
-    const name=ni.value.trim(); if(!name) return;
-    const selQ=modal._selQ?modal._selQ():"";
+    const name=ni.value.trim();if(!name)return;
     const srcAnswer=selQ?(p.strategy?.[selQ]||""):"";
     const data={name,color:selColor,stage:selStage,sourceQuestion:selQ||null,sourceAnswer:srcAnswer||null,brief:angle?.brief||{},tasks:angle?.tasks||[]};
-    if(!state.products[pid].angles) state.products[pid].angles={};
-    if(isEdit) Object.assign(state.products[pid].angles[aid],data);
+    if(!state.products[pid].angles)state.products[pid].angles={};
+    if(isEdit)Object.assign(state.products[pid].angles[aid],data);
     else state.products[pid].angles[genId()]=data;
     save();render();bg.remove();
   }},isEdit?"Save Changes":"Create Angle"));
-  modal.appendChild(mf);
-  bg.appendChild(modal); document.body.appendChild(bg);
+  modal.appendChild(mf);bg.appendChild(modal);document.body.appendChild(bg);
   setTimeout(()=>ni.focus(),50);
 }
 
 function openBriefModal(pid,aid,angle){
-  const bg=mkBg();
-  const modal=h("div",{class:"modal"});
+  const bg=mkBg();const modal=h("div",{class:"modal"});
   modal.appendChild(mkHead("Brief — "+angle.name,()=>bg.remove()));
   const mb=h("div",{class:"mbody"});
-  const brief={...(angle.brief||{})};
+  const existing=angle.brief||{};
+  const brief={...existing};
+  if(!brief.createdAt)brief.createdAt=Date.now();
+  mb.appendChild(css(h("div",{},"📅 Briefed "+fmtDate(brief.createdAt)),{fontSize:"11px",color:"var(--subtle)",fontWeight:"600",marginBottom:"18px",padding:"8px 12px",background:"var(--cream)",borderRadius:"8px",display:"inline-block"}));
   [
-    {key:"objective", label:"Objective",          ph:"What's the goal of this content?"},
-    {key:"audience",  label:"Target Audience",     ph:"Who are we speaking to?"},
-    {key:"formats",   label:"Content Formats",     ph:"UGC, talking head, GRWM, demo…"},
-    {key:"hooks",     label:"Hook Ideas",           ph:"Opening lines or visual hooks to test"},
-    {key:"dos",       label:"Do's",                ph:"What creators should do"},
-    {key:"donts",     label:"Don'ts",              ph:"Things to avoid"},
-    {key:"references",label:"References / Inspo",  ph:"Links or reference content"},
-    {key:"deadline",  label:"Deadline",            ph:"e.g. March 20, 2026"},
+    {key:"objective",label:"Objective",          ph:"What's the goal of this content?"},
+    {key:"formats",  label:"Content Formats",    ph:"UGC, talking head, GRWM, demo…"},
+    {key:"hooks",    label:"Hook Ideas",          ph:"Opening lines or visual hooks to test"},
+    {key:"copy",     label:"Copy Notes",          ph:"Key phrases, proof points, copy direction"},
   ].forEach(f=>{
-    const r=h("div",{class:"frow"});
-    r.appendChild(h("label",{class:"flabel"},f.label));
+    const r=h("div",{class:"frow"});r.appendChild(h("label",{class:"flabel"},f.label));
     const ta=h("textarea",{class:"input",placeholder:f.ph});
-    ta.value=brief[f.key]||"";
-    ta.oninput=e=>{brief[f.key]=e.target.value;};
-    r.appendChild(ta); mb.appendChild(r);
+    ta.value=brief[f.key]||"";ta.oninput=e=>{brief[f.key]=e.target.value;};
+    r.appendChild(ta);mb.appendChild(r);
   });
   modal.appendChild(mb);
   const mf=h("div",{class:"mfoot"});
   mf.appendChild(h("button",{class:"btn btn-ghost",onclick:()=>bg.remove()},"Cancel"));
-  mf.appendChild(h("button",{class:"btn btn-navy",onclick:()=>{
-    state.products[pid].angles[aid].brief=brief;
-    save();render();bg.remove();
-  }},"Save Brief"));
-  modal.appendChild(mf);
-  bg.appendChild(modal); document.body.appendChild(bg);
+  mf.appendChild(h("button",{class:"btn btn-navy",onclick:()=>{state.products[pid].angles[aid].brief=brief;save();render();bg.remove();}},"Save Brief"));
+  modal.appendChild(mf);bg.appendChild(modal);document.body.appendChild(bg);
 }
 
 function openTaskModal(pid,aid,angle,idx){
   const isEdit=idx!==null;
   const ex=isEdit?(angle.tasks[idx]||{}):{};
-  const bg=mkBg();
-  const modal=h("div",{class:"modal"});
-  modal.appendChild(mkHead(isEdit?"Edit Task":"Add Task",()=>bg.remove()));
+  const bg=mkBg();const modal=h("div",{class:"modal"});
+  modal.appendChild(mkHead(isEdit?"Edit Task":"Add Task — "+angle.name,()=>bg.remove()));
   const mb=h("div",{class:"mbody"});
-  const vals={title:ex.title||"",assignee:ex.assignee||"",due:ex.due||"",notes:ex.notes||""};
-  [
-    {key:"title",    label:"Task",        type:"input",    ph:"e.g. Film UGC demo"},
-    {key:"assignee", label:"Assigned To", type:"input",    ph:"e.g. Amber"},
-    {key:"due",      label:"Due Date",    type:"input",    ph:"e.g. March 20"},
-    {key:"notes",    label:"Notes",       type:"textarea", ph:"Any extra details…"},
-  ].forEach(f=>{
-    const r=h("div",{class:"frow"}); r.appendChild(h("label",{class:"flabel"},f.label));
-    const el=f.type==="textarea"?h("textarea",{class:"input",placeholder:f.ph}):h("input",{class:"input",placeholder:f.ph});
-    el.value=vals[f.key]; el.oninput=e=>{vals[f.key]=e.target.value;};
-    r.appendChild(el); mb.appendChild(r);
-  });
-  let tStage=ex.stage||"Assigned";
-  const sr=h("div",{class:"frow"}); sr.appendChild(h("label",{class:"flabel"},"Stage"));
-  const ss=h("div",{class:"stage-sel"});
-  STAGES.forEach(s=>{
-    const sc=stageCfg(s);
-    const btn=h("button",{class:"sstage",onclick:()=>{
-      tStage=s;
-      ss.querySelectorAll(".sstage").forEach(b=>{b.style.background="";b.style.borderColor="";b.style.color="";});
-      Object.assign(btn.style,{background:sc.bg,borderColor:sc.color,color:sc.color});
-    }},s);
-    if(tStage===s) Object.assign(btn.style,{background:sc.bg,borderColor:sc.color,color:sc.color});
-    ss.appendChild(btn);
-  });
-  sr.appendChild(ss); mb.appendChild(sr);
+
+  // Show brief objective as context
+  const brief=angle.brief||{};
+  if(brief.objective){
+    const ctx=h("div",{class:"brief-ctx"});
+    ctx.appendChild(h("strong",{},"Brief: "));
+    ctx.appendChild(document.createTextNode(brief.objective));
+    mb.appendChild(ctx);
+  }
+
+  const vals={title:ex.title||"",assignee:ex.assignee||"",due:ex.due||""};
+
+  const tr=h("div",{class:"frow"});tr.appendChild(h("label",{class:"flabel"},"Task"));
+  const ti=h("input",{class:"input",placeholder:"e.g. Film UGC demo, Write hook copy, Edit video…",value:vals.title});
+  ti.oninput=e=>vals.title=e.target.value;tr.appendChild(ti);mb.appendChild(tr);
+
+  const ar=h("div",{class:"frow"});ar.appendChild(h("label",{class:"flabel"},"Assigned To"));
+  const ai=h("input",{class:"input",placeholder:"e.g. Amber",value:vals.assignee});
+  ai.oninput=e=>vals.assignee=e.target.value;ar.appendChild(ai);mb.appendChild(ar);
+
+  const dr=h("div",{class:"frow"});dr.appendChild(h("label",{class:"flabel"},"Due Date"));
+  const di=h("input",{class:"input",type:"date",value:vals.due});
+  di.oninput=e=>vals.due=e.target.value;dr.appendChild(di);mb.appendChild(dr);
+
+  if(isEdit&&ex.assignedAt){
+    mb.appendChild(css(h("div",{},"Assigned: "+fmtDate(ex.assignedAt)),{fontSize:"11px",color:"var(--subtle)",marginTop:"-8px",marginBottom:"12px"}));
+  }
+
   modal.appendChild(mb);
   const mf=h("div",{class:"mfoot"});
   mf.appendChild(h("button",{class:"btn btn-ghost",onclick:()=>bg.remove()},"Cancel"));
   mf.appendChild(h("button",{class:"btn btn-navy",onclick:()=>{
-    if(!vals.title.trim()) return;
-    const task={id:genId(),...vals,stage:tStage,done:ex.done||false};
-    if(!state.products[pid].angles[aid].tasks) state.products[pid].angles[aid].tasks=[];
-    if(isEdit) state.products[pid].angles[aid].tasks[idx]=task;
+    if(!vals.title.trim())return;
+    const task={id:ex.id||genId(),title:vals.title.trim(),assignee:vals.assignee.trim(),due:vals.due,assignedAt:ex.assignedAt||Date.now(),done:ex.done||false};
+    if(!state.products[pid].angles[aid].tasks)state.products[pid].angles[aid].tasks=[];
+    if(isEdit)state.products[pid].angles[aid].tasks[idx]=task;
     else state.products[pid].angles[aid].tasks.push(task);
     save();render();bg.remove();
   }},isEdit?"Save Task":"Add Task"));
-  modal.appendChild(mf);
-  bg.appendChild(modal); document.body.appendChild(bg);
+  modal.appendChild(mf);bg.appendChild(modal);document.body.appendChild(bg);
+  setTimeout(()=>ti.focus(),50);
 }
 
-// ── Modal helpers ──
 function mkBg(){
   const bg=h("div",{class:"modal-bg"});
-  bg.onclick=e=>{if(e.target===bg)bg.remove();};
-  return bg;
+  bg.onclick=e=>{if(e.target===bg)bg.remove();};return bg;
 }
 function mkHead(title,onClose){
   const mh=h("div",{class:"mhead"});
@@ -914,8 +783,7 @@ function mkHead(title,onClose){
   return mh;
 }
 
-// ══ BOOT ══
-if(window.__fbReady) initFB();
+if(window.__fbReady)initFB();
 else document.addEventListener("fb-ready",initFB);
 </script>
 </body>
