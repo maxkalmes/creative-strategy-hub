@@ -229,8 +229,8 @@ const STRATEGY_QS=[
 ];
 const TAG_CLS={core:"tag-core",connect:"tag-connect",hook:"tag-hook",convert:"tag-convert",proof:"tag-proof"};
 let DB={products:{}},VIEW={type:"overview"},detailTab="strategy",openAngles={},_fb,saveTimer,fbListening=false;
-function initFB(){_fb=window.__fb;if(fbListening)return;fbListening=true;_fb.onValue(_fb.ref(_fb.db,"kopari_hub"),snap=>{const v=snap.val();if(v?.products)DB.products=v.products;document.getElementById("loading").style.display="none";document.getElementById("app").style.display="block";render();setSyncStatus("live");});}
-function save(){setSyncStatus("saving");clearTimeout(saveTimer);saveTimer=setTimeout(()=>{_fb.set(_fb.ref(_fb.db,"kopari_hub"),DB);setTimeout(()=>setSyncStatus("live"),600);},500);}
+function initFB(){_fb=window.__fb;if(fbListening)return;fbListening=true;_fb.onValue(_fb.ref(_fb.db,"kopari_hub"),snap=>{const v=snap.val();if(v?.products)DB.products=v.products;document.getElementById("loading").style.display="none";document.getElementById("app").style.display="block";const _a=document.activeElement;if(!_a||(_a.tagName!=="TEXTAREA"&&_a.tagName!=="INPUT"))render();setSyncStatus("live");});}
+function save(){setSyncStatus("saving");clearTimeout(saveTimer);saveTimer=setTimeout(()=>{_fb.set(_fb.ref(_fb.db,"kopari_hub"),DB);setTimeout(()=>setSyncStatus("live"),600);},1500);}
 function setSyncStatus(s){const dot=document.getElementById("syncDot"),txt=document.getElementById("syncTxt");if(!dot)return;if(s==="live"){dot.className="sync-dot live";txt.textContent="Live ✓";}if(s==="saving"){dot.className="sync-dot saving";txt.textContent="Saving…";}}
 function genId(){return Date.now().toString(36)+Math.random().toString(36).slice(2,5);}
 function h(tag,attrs={},...kids){const el=document.createElement(tag);for(const[k,v]of Object.entries(attrs)){if(k==="class")el.className=v;else if(k.startsWith("on"))el[k]=v;else el.setAttribute(k,v);}kids.flat().forEach(c=>{if(c==null)return;el.appendChild(typeof c==="string"?document.createTextNode(c):c);});return el;}
