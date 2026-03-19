@@ -257,9 +257,12 @@ textarea.finput{resize:vertical;min-height:80px;line-height:1.6}
       <div class="topbar-sep"></div>
       <span class="topbar-title">Creative Strategy Hub</span>
     </div>
-    <div class="sync-wrap">
-      <span class="sync-dot" id="syncDot"></span>
-      <span class="sync-txt" id="syncTxt">Connecting…</span>
+    <div style="display:flex;align-items:center;gap:14px">
+      <button onclick="openApiKeyModal()" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.6);border-radius:8px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;letter-spacing:.04em;font-family:inherit" id="apiKeyBtn">⚙ AI Key</button>
+      <div class="sync-wrap">
+        <span class="sync-dot" id="syncDot"></span>
+        <span class="sync-txt" id="syncTxt">Connecting…</span>
+      </div>
     </div>
   </div>
   <div class="page" id="mainPage"></div>
@@ -286,7 +289,7 @@ const STRATEGY_QS=[
 ];
 const TAG_CLS={core:"tag-core",connect:"tag-connect",hook:"tag-hook",convert:"tag-convert",proof:"tag-proof"};
 let DB={products:{}},VIEW={type:"overview"},detailTab="strategy",openAngles={},_fb,saveTimer,fbListening=false;
-function initFB(){_fb=window.__fb;if(fbListening)return;fbListening=true;_fb.onValue(_fb.ref(_fb.db,"kopari_hub"),snap=>{const v=snap.val();if(v?.products)DB.products=v.products;document.getElementById("loading").style.display="none";document.getElementById("app").style.display="block";const _a=document.activeElement;if(!_a||(_a.tagName!=="TEXTAREA"&&_a.tagName!=="INPUT"))render();setSyncStatus("live");});}
+function initFB(){_fb=window.__fb;if(fbListening)return;fbListening=true;_fb.onValue(_fb.ref(_fb.db,"kopari_hub"),snap=>{const v=snap.val();if(v?.products)DB.products=v.products;if(v?.settings)DB.settings=v.settings;document.getElementById("loading").style.display="none";document.getElementById("app").style.display="block";const _a=document.activeElement;if(!_a||(_a.tagName!=="TEXTAREA"&&_a.tagName!=="INPUT"))render();updateApiKeyBtn();setSyncStatus("live");});}
 function save(){setSyncStatus("saving");clearTimeout(saveTimer);saveTimer=setTimeout(()=>{_fb.set(_fb.ref(_fb.db,"kopari_hub"),DB);setTimeout(()=>setSyncStatus("live"),600);},1500);}
 function setSyncStatus(s){const dot=document.getElementById("syncDot"),txt=document.getElementById("syncTxt");if(!dot)return;if(s==="live"){dot.className="sync-dot live";txt.textContent="Live ✓";}if(s==="saving"){dot.className="sync-dot saving";txt.textContent="Saving…";}}
 function genId(){return Date.now().toString(36)+Math.random().toString(36).slice(2,5);}
@@ -358,21 +361,71 @@ function parseCsv(text) {
 }
 // Sync sheet for a product
 async function syncSheet(pid) {
-  const p = DB.products[pid];
+  var p = DB.products[pid];
   if (!p.sheetUrl) return;
-  const csvUrl = sheetToCsvUrl(p.sheetUrl);
-  if (!csvUrl) { alert('Invalid Google Sheets URL'); return; }
+
+  // Extract spreadsheet ID
+  var mId = p.sheetUrl.match(/\/d\/([a-zA-Z0-9-_]+)/);
+  if (!mId) { alert('Invalid Google Sheets URL'); return; }
+  var sheetId = mId[1];
 
   setSyncStatus('saving');
   try {
-    const res = await fetch(csvUrl);
-    if (!res.ok) throw new Error('Could not fetch sheet. Make sure it is shared as "Anyone with link can view".');
-    const text = await res.text();
-    const rows = parseCsv(text);
+    // Step 1: fetch the sheet metadata to get all tab gids + names
+    var metaUrl = 'https://docs.google.com/spreadsheets/d/' + sheetId + '/edit';
+    // We can't read metadata directly — instead, we fetch each known gid
+    // The user's sheet has named tabs. We fetch the main export (all sheets merged)
+    // by using the gid list stored on the product, or default to scanning gid 0,1,2...
+    // Best approach for multi-tab: fetch each tab by gid sequentially until we get empty
+
+    var allRows = [];
+    var tabNames = p.sheetTabs || []; // [{gid, name}] stored after first sync
+
+    if (tabNames.length === 0) {
+      // First sync: just fetch gid=0 and store — user can add more tabs manually
+      var csvUrl0 = 'https://docs.google.com/spreadsheets/d/' + sheetId + '/export?format=csv&gid=0';
+      var r0 = await fetch(csvUrl0);
+      if (!r0.ok) throw new Error('Could not fetch sheet. Make sure it is shared as "Anyone with link can view".');
+      var t0 = await r0.text();
+      var rows0 = parseCsv(t0);
+      rows0.forEach(function(row){ row._tab = 'Tab 1'; });
+      allRows = allRows.concat(rows0);
+      // Try to auto-detect more tabs (gid 1..5)
+      for (var g = 1; g <= 5; g++) {
+        try {
+          var csvUrlG = 'https://docs.google.com/spreadsheets/d/' + sheetId + '/export?format=csv&gid=' + g;
+          var rG = await fetch(csvUrlG);
+          if (!rG.ok) break;
+          var tG = await rG.text();
+          if (tG.includes('<!DOCTYPE') || tG.includes('<html')) break; // got an error page
+          var rowsG = parseCsv(tG);
+          if (rowsG.length === 0) break;
+          rowsG.forEach(function(row){ row._tab = 'Tab ' + (g+1); });
+          allRows = allRows.concat(rowsG);
+        } catch(e) { break; }
+      }
+    } else {
+      // Subsequent syncs: fetch all stored tabs
+      for (var ti = 0; ti < tabNames.length; ti++) {
+        var tab = tabNames[ti];
+        var csvUrl = 'https://docs.google.com/spreadsheets/d/' + sheetId + '/export?format=csv&gid=' + tab.gid;
+        var resp = await fetch(csvUrl);
+        if (!resp.ok) continue;
+        var text = await resp.text();
+        if (text.includes('<!DOCTYPE') || text.includes('<html')) continue;
+        var rows = parseCsv(text);
+        rows.forEach(function(row){ row._tab = tab.name; });
+        allRows = allRows.concat(rows);
+      }
+    }
+
     if (!DB.products[pid].reviews) DB.products[pid].reviews = {};
-    // Keyed by Okendo ID or row index for deduplication
-    rows.forEach((row, i) => {
-      const key = (row['Okendo ID'] || ('row_'+i)).replace(/[^a-zA-Z0-9_-]/g,'_');
+    // Clear old reviews and replace with fresh data
+    DB.products[pid].reviews = {};
+    allRows.forEach(function(row, i) {
+      var key = (row['Okendo ID'] || ('row_'+i)).replace(/[^a-zA-Z0-9_-]/g,'_');
+      // Avoid key collisions across tabs
+      while (DB.products[pid].reviews[key]) key = key + '_x';
       DB.products[pid].reviews[key] = {
         id:        row['Okendo ID'] || '',
         name:      row['Name'] || 'Anonymous',
@@ -381,6 +434,7 @@ async function syncSheet(pid) {
         product:   row['Product'] || '',
         title:     row['Title'] || '',
         body:      row['Body'] || '',
+        tab:       row['_tab'] || '',
         synced:    Date.now(),
       };
     });
@@ -394,21 +448,32 @@ async function syncSheet(pid) {
   }
 }
 
+// Add a tab manually by gid
+async function addSheetTab(pid, gid, name) {
+  var p = DB.products[pid];
+  if (!p.sheetTabs) p.sheetTabs = [];
+  // Remove existing entry with same gid
+  p.sheetTabs = p.sheetTabs.filter(function(t){ return t.gid !== gid; });
+  p.sheetTabs.push({gid: gid, name: name});
+  await syncSheet(pid);
+}
+
+
 // Build the Reviews tab content
 function buildReviewsSection(pid, p) {
-  const wrap = h('div', {});
+  var wrap = h('div', {});
 
-  // ── Sheet setup / sync bar ──
+  // ── Sheet setup ──
   if (!p.sheetUrl) {
-    const setup = h('div', {class:'sheet-setup'});
+    var setup = h('div', {class:'sheet-setup'});
     setup.appendChild(h('div', {class:'sheet-setup-title'}, '🔗 Connect your Google Sheet'));
     setup.appendChild(h('div', {class:'sheet-setup-sub'},
-      'Paste your Google Sheet URL below. Make sure the sheet is set to "Anyone with link can view". Columns expected: Okendo ID, Name, Sentiment, Rating, Product, Title, Body.'
+      'Paste your Google Sheet URL below. Make sure it is shared as "Anyone with link can view". Columns: Okendo ID, Name, Sentiment, Rating, Product, Title, Body.'
     ));
-    const row = h('div', {class:'sheet-input-row'});
-    const inp = h('input', {class:'sheet-input', placeholder:'https://docs.google.com/spreadsheets/d/...'});
-    const connectBtn = h('button', {class:'btn btn-dark btn-sm', onclick: async () => {
-      const url = inp.value.trim();
+    var row = h('div', {class:'sheet-input-row'});
+    var inp = h('input', {class:'sheet-input', placeholder:'https://docs.google.com/spreadsheets/d/...'});
+    var connectBtn = h('button', {class:'btn btn-dark btn-sm', onclick: async function() {
+      var url = inp.value.trim();
       if (!url) return;
       DB.products[pid].sheetUrl = url;
       save();
@@ -420,65 +485,131 @@ function buildReviewsSection(pid, p) {
     return wrap;
   }
 
-  // ── Sync bar (already connected) ──
-  const syncBar = h('div', {class:'sync-bar'});
+  // ── Sync bar ──
+  var syncBar = h('div', {class:'sync-bar'});
   syncBar.appendChild(css(h('span', {}, '🔗'), {fontSize:'14px', flexShrink:'0'}));
   syncBar.appendChild(h('span', {class:'sync-bar-url'}, p.sheetUrl));
-  const barActs = h('div', {class:'sync-bar-actions'});
-  barActs.appendChild(h('button', {class:'btn btn-dark btn-xs', onclick: async () => {
+  var barActs = h('div', {class:'sync-bar-actions'});
+  barActs.appendChild(h('button', {class:'btn btn-dark btn-xs', onclick: async function() {
     await syncSheet(pid);
   }}, '↻ Sync Now'));
-  barActs.appendChild(h('button', {class:'btn btn-ghost btn-xs', onclick: () => {
+  barActs.appendChild(h('button', {class:'btn btn-ghost btn-xs', onclick: function() {
     if (confirm('Disconnect this sheet?')) {
       delete DB.products[pid].sheetUrl;
       delete DB.products[pid].reviews;
+      delete DB.products[pid].sheetTabs;
       save(); render();
     }
   }}, 'Disconnect'));
-  if (p.lastSynced) barActs.appendChild(css(h('span', {}, 'Last synced ' + fmtDate(p.lastSynced)), {fontSize:'10px', color:'var(--subtle)', fontWeight:'500'}));
+  if (p.lastSynced) barActs.appendChild(css(h('span', {}, 'Synced ' + fmtDate(p.lastSynced)), {fontSize:'10px', color:'var(--subtle)', fontWeight:'500'}));
   syncBar.appendChild(barActs);
   wrap.appendChild(syncBar);
 
-  // ── Reviews ──
-  const reviews = Object.values(p.reviews || {});
+  var reviews = Object.values(p.reviews || {});
   if (!reviews.length) {
     wrap.appendChild(buildEmpty('No reviews yet', 'Hit Sync Now to pull from your sheet.'));
     return wrap;
   }
 
-  // Toolbar
-  const toolbar = h('div', {class:'reviews-toolbar'});
-  toolbar.appendChild(h('span', {class:'reviews-meta'}, reviews.length + ' reviews'));
-  const filters = h('div', {class:'reviews-filters'});
-  let activeFilter = 'All';
-  const grid = h('div', {class:'reviews-grid'});
+  // ── Build filter options ──
+  // Collect unique product names from the data
+  var productNames = [];
+  reviews.forEach(function(r) {
+    if (r.product && productNames.indexOf(r.product) === -1) productNames.push(r.product);
+  });
+  productNames.sort();
 
-  function applyRFilter(f) {
-    activeFilter = f;
-    filters.querySelectorAll('.rfil').forEach(t => t.classList.remove('on'));
-    filters.querySelector('[data-rf="'+f+'"]').classList.add('on');
-    grid.innerHTML = '';
-    let filtered = reviews;
-    if (f === 'Positive') filtered = reviews.filter(r => r.sentiment === 'positive');
-    if (f === 'Negative') filtered = reviews.filter(r => r.sentiment === 'negative');
-    if (f === 'Neutral')  filtered = reviews.filter(r => r.sentiment === 'neutral');
-    if (f === '5★') filtered = reviews.filter(r => r.rating === 5);
-    if (f === '1-2★') filtered = reviews.filter(r => r.rating <= 2 && r.rating > 0);
-    filtered.forEach(r => grid.appendChild(buildReviewCard(pid, p, r)));
-    if (!filtered.length) grid.appendChild(buildEmpty('No reviews match', 'Try a different filter.'));
+  // Toolbar row 1: product filter
+  var toolbar = h('div', {});
+
+  // Product filter pills (if multiple products exist)
+  if (productNames.length > 1) {
+    var prodFilterWrap = h('div', {});
+    css(prodFilterWrap, {display:'flex', alignItems:'center', gap:'8px', marginBottom:'12px', flexWrap:'wrap'});
+    prodFilterWrap.appendChild(css(h('span', {}, 'Product:'), {fontSize:'11px', fontWeight:'700', color:'var(--subtle)', letterSpacing:'.06em', textTransform:'uppercase', flexShrink:'0'}));
+    var prodFilters = h('div', {class:'reviews-filters'});
+    var activeProd = 'All Products';
+
+    function buildProdFilters() {
+      prodFilters.innerHTML = '';
+      ['All Products'].concat(productNames).forEach(function(pname) {
+        var t = h('button', {class:'rfil' + (pname === activeProd ? ' on' : '')}, pname);
+        t.onclick = function() { activeProd = pname; buildProdFilters(); applyFilters(); };
+        prodFilters.appendChild(t);
+      });
+    }
+    prodFilterWrap.appendChild(prodFilters);
+    wrap.appendChild(prodFilterWrap);
+    buildProdFilters();
   }
 
-  ['All','Positive','Negative','Neutral','5★','1-2★'].forEach(f => {
-    const t = h('button', {class:'rfil'}, f); t.dataset.rf = f;
-    t.onclick = () => applyRFilter(f);
-    filters.appendChild(t);
+  // Toolbar row 2: sentiment/rating filters + count
+  var toolbar2 = h('div', {class:'reviews-toolbar'});
+  var countEl = h('span', {class:'reviews-meta'}, reviews.length + ' reviews');
+  toolbar2.appendChild(countEl);
+  var sentFilters = h('div', {class:'reviews-filters'});
+  var activeSent = 'All';
+
+  ['All','Positive','Negative','Neutral','5★','1-2★'].forEach(function(f) {
+    var t = h('button', {class:'rfil' + (f === activeSent ? ' on' : '')}, f);
+    t.dataset.sf = f;
+    t.onclick = function() { activeSent = f; sentFilters.querySelectorAll('.rfil').forEach(function(x){ x.classList.remove('on'); }); t.classList.add('on'); applyFilters(); };
+    sentFilters.appendChild(t);
   });
-  toolbar.appendChild(filters);
-  wrap.appendChild(toolbar);
-  applyRFilter('All');
+  toolbar2.appendChild(sentFilters);
+  wrap.appendChild(toolbar2);
+
+  var grid = h('div', {class:'reviews-grid'});
   wrap.appendChild(grid);
+
+  var activeProd2 = typeof activeProd !== 'undefined' ? null : null; // reference via closure
+
+  function applyFilters() {
+    // Read current active product filter
+    var selProd = 'All Products';
+    var prodBtns = wrap.querySelectorAll('.reviews-filters .rfil');
+    // Find the product filter row separately — use data attribute
+    var allRfil = wrap.querySelectorAll('[data-pf]');
+    allRfil.forEach(function(b){ if(b.classList.contains('on')) selProd = b.dataset.pf; });
+
+    grid.innerHTML = '';
+    var filtered = reviews.filter(function(r) {
+      var prodMatch = selProd === 'All Products' || r.product === selProd;
+      var sentMatch = true;
+      if (activeSent === 'Positive') sentMatch = r.sentiment === 'positive';
+      else if (activeSent === 'Negative') sentMatch = r.sentiment === 'negative';
+      else if (activeSent === 'Neutral') sentMatch = r.sentiment === 'neutral';
+      else if (activeSent === '5★') sentMatch = r.rating === 5;
+      else if (activeSent === '1-2★') sentMatch = r.rating <= 2 && r.rating > 0;
+      return prodMatch && sentMatch;
+    });
+    countEl.textContent = filtered.length + ' of ' + reviews.length + ' reviews';
+    if (!filtered.length) {
+      grid.appendChild(buildEmpty('No reviews match', 'Try a different filter.'));
+    } else {
+      filtered.forEach(function(r){ grid.appendChild(buildReviewCard(pid, p, r)); });
+    }
+  }
+
+  // Rebuild product filter with data-pf attributes for applyFilters to read
+  if (productNames.length > 1) {
+    var pfRow = wrap.querySelector('.reviews-filters');
+    if (pfRow) {
+      pfRow.querySelectorAll('.rfil').forEach(function(btn, i) {
+        btn.dataset.pf = i === 0 ? 'All Products' : productNames[i-1];
+        btn.onclick = function() {
+          pfRow.querySelectorAll('.rfil').forEach(function(x){ x.classList.remove('on'); });
+          btn.classList.add('on');
+          applyFilters();
+        };
+      });
+    }
+  }
+
+  applyFilters();
   return wrap;
 }
+
 
 function buildReviewCard(pid, p, r) {
   const card = h('div', {class:'review-card'});
@@ -582,16 +713,34 @@ Respond ONLY with valid JSON in this exact format, no markdown, no extra text:
   ]
 }`;
 
+  // Get API key from Firebase (shared across all team members)
+  const apiKey = DB.settings && DB.settings.anthropicKey;
+  if (!apiKey) {
+    btn.disabled = false;
+    btn.innerHTML = '✦ Generate Angles';
+    openApiKeyModal();
+    return;
+  }
+
   try {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-sonnet-4-6',
         max_tokens: 1000,
         messages: [{ role: 'user', content: prompt }]
       })
     });
+    if (!res.ok) {
+      const errData = await res.json().catch(()=>({}));
+      throw new Error(errData.error?.message || 'API error ' + res.status);
+    }
     const data = await res.json();
     const raw = (data.content || []).map(c => c.text || '').join('');
     const clean = raw.replace(/```json|```/g, '').trim();
@@ -640,6 +789,77 @@ Respond ONLY with valid JSON in this exact format, no markdown, no extra text:
   btn.innerHTML = '↻ Regenerate';
 }
 
+
+// ── API KEY MODAL ──
+function openApiKeyModal() {
+  const existing = document.getElementById('apiKeyModal');
+  if (existing) { existing.remove(); }
+
+  const bg = mkBg();
+  bg.id = 'apiKeyModal';
+  const modal = h('div', {class:'modal'});
+  modal.appendChild(mkHead('AI Settings', () => bg.remove()));
+
+  const mb = h('div', {class:'modal-body'});
+
+  const info = h('div', {});
+  css(info, {background:'#FFF8E7', border:'1px solid #F0DFA0', borderRadius:'10px', padding:'12px 14px', marginBottom:'18px', fontSize:'12px', color:'#92650A', lineHeight:'1.6'});
+  info.innerHTML = '<strong>Shared across your whole team.</strong> Add your Anthropic API key once and everyone with access to this tool can use AI angle generation automatically. Get a key at <a href="https://console.anthropic.com" target="_blank" style="color:#B8953F;font-weight:700;">console.anthropic.com</a>.';
+  mb.appendChild(info);
+
+  const r = h('div', {class:'frow'});
+  r.appendChild(h('label', {class:'flabel'}, 'Anthropic API Key'));
+  const inp = h('input', {class:'finput', placeholder:'sk-ant-...'});
+  const saved = DB.settings && DB.settings.anthropicKey;
+  if (saved) inp.value = saved;
+  inp.type = 'password';
+  r.appendChild(inp);
+  mb.appendChild(r);
+
+  const toggle = h('button', {class:'btn btn-ghost btn-xs', onclick:()=>{
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+    toggle.textContent = inp.type === 'password' ? 'Show' : 'Hide';
+  }}, 'Show');
+  css(toggle, {marginTop:'-8px', marginBottom:'12px'});
+  mb.appendChild(toggle);
+
+  modal.appendChild(mb);
+  const mf = h('div', {class:'modal-foot'});
+  if (saved) {
+    mf.appendChild(h('button', {class:'btn btn-danger', onclick:()=>{
+      if (!DB.settings) DB.settings = {};
+      delete DB.settings.anthropicKey;
+      save();
+      updateApiKeyBtn();
+      bg.remove();
+    }}, 'Remove Key'));
+  }
+  mf.appendChild(h('button', {class:'btn btn-ghost', onclick:()=>bg.remove()}, 'Cancel'));
+  mf.appendChild(h('button', {class:'btn btn-dark', onclick:()=>{
+    const key = inp.value.trim();
+    if (!key.startsWith('sk-')) { alert("Doesn't look like a valid key — should start with sk-ant-"); return; }
+    if (!DB.settings) DB.settings = {};
+    DB.settings.anthropicKey = key;
+    save();
+    updateApiKeyBtn();
+    bg.remove();
+  }}, 'Save for Everyone'));
+  modal.appendChild(mf);
+  bg.appendChild(modal);
+  document.body.appendChild(bg);
+  setTimeout(() => inp.focus(), 50);
+}
+
+function updateApiKeyBtn() {
+  const btn = document.getElementById('apiKeyBtn');
+  if (!btn) return;
+  const hasKey = DB.settings && DB.settings.anthropicKey;
+  btn.textContent = hasKey ? '✓ AI Ready' : '⚙ AI Key';
+  btn.style.color = hasKey ? '#6ee7b7' : 'rgba(255,255,255,0.6)';
+  btn.style.borderColor = hasKey ? 'rgba(110,231,183,0.3)' : 'rgba(255,255,255,0.15)';
+}
+
+// API key button updated after Firebase loads via updateApiKeyBtn()
 if(window.__fbReady)initFB();
 else document.addEventListener("fb-ready",initFB);
 </script>
