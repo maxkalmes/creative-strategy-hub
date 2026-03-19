@@ -225,18 +225,9 @@ textarea.finput{resize:vertical;min-height:80px;line-height:1.6}
 .review-date{font-size:10px;color:var(--subtle)}
 
 /* generated angles from review */
-.gen-angles-wrap{margin-top:14px;padding-top:14px;border-top:1px solid var(--cream2)}
-.gen-angles-title{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--subtle);margin-bottom:10px}
-.gen-angle-item{background:var(--cream);border:1px solid var(--border);border-radius:var(--r-md);padding:12px 14px;margin-bottom:8px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
-.gen-angle-text{flex:1}
-.gen-angle-hook{font-size:12px;font-weight:700;color:var(--ink);margin-bottom:3px}
-.gen-angle-why{font-size:11px;color:var(--muted);line-height:1.55}
-.gen-angle-save{flex-shrink:0}
 
-/* loading spinner for AI */
-@keyframes spin{to{transform:rotate(360deg)}}
-.spinner{width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:middle;margin-right:6px}
-.generating-msg{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:8px;padding:12px 0}
+
+
 
 .sync-bar{display:flex;align-items:center;gap:10px;background:var(--cream2);border-radius:var(--r-md);padding:10px 16px;margin-bottom:20px}
 .sync-bar-url{flex:1;font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -257,12 +248,9 @@ textarea.finput{resize:vertical;min-height:80px;line-height:1.6}
       <div class="topbar-sep"></div>
       <span class="topbar-title">Creative Strategy Hub</span>
     </div>
-    <div style="display:flex;align-items:center;gap:14px">
-      <button onclick="openApiKeyModal()" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.6);border-radius:8px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;letter-spacing:.04em;font-family:inherit" id="apiKeyBtn">⚙ AI Key</button>
-      <div class="sync-wrap">
-        <span class="sync-dot" id="syncDot"></span>
-        <span class="sync-txt" id="syncTxt">Connecting…</span>
-      </div>
+    <div class="sync-wrap">
+      <span class="sync-dot" id="syncDot"></span>
+      <span class="sync-txt" id="syncTxt">Connecting…</span>
     </div>
   </div>
   <div class="page" id="mainPage"></div>
@@ -289,7 +277,7 @@ const STRATEGY_QS=[
 ];
 const TAG_CLS={core:"tag-core",connect:"tag-connect",hook:"tag-hook",convert:"tag-convert",proof:"tag-proof"};
 let DB={products:{}},VIEW={type:"overview"},detailTab="strategy",openAngles={},_fb,saveTimer,fbListening=false;
-function initFB(){_fb=window.__fb;if(fbListening)return;fbListening=true;_fb.onValue(_fb.ref(_fb.db,"kopari_hub"),snap=>{const v=snap.val();if(v?.products)DB.products=v.products;if(v?.settings)DB.settings=v.settings;document.getElementById("loading").style.display="none";document.getElementById("app").style.display="block";const _a=document.activeElement;if(!_a||(_a.tagName!=="TEXTAREA"&&_a.tagName!=="INPUT"))render();updateApiKeyBtn();setSyncStatus("live");});}
+function initFB(){_fb=window.__fb;if(fbListening)return;fbListening=true;_fb.onValue(_fb.ref(_fb.db,"kopari_hub"),snap=>{const v=snap.val();if(v?.products)DB.products=v.products;document.getElementById("loading").style.display="none";document.getElementById("app").style.display="block";const _a=document.activeElement;if(!_a||(_a.tagName!=="TEXTAREA"&&_a.tagName!=="INPUT"))render();setSyncStatus("live");});}
 function save(){setSyncStatus("saving");clearTimeout(saveTimer);saveTimer=setTimeout(()=>{_fb.set(_fb.ref(_fb.db,"kopari_hub"),DB);setTimeout(()=>setSyncStatus("live"),600);},1500);}
 function setSyncStatus(s){const dot=document.getElementById("syncDot"),txt=document.getElementById("syncTxt");if(!dot)return;if(s==="live"){dot.className="sync-dot live";txt.textContent="Live ✓";}if(s==="saving"){dot.className="sync-dot saving";txt.textContent="Saving…";}}
 function genId(){return Date.now().toString(36)+Math.random().toString(36).slice(2,5);}
@@ -659,7 +647,7 @@ function buildReviewCard(pid, p, r) {
   // Generate angles button
   const genWrap = h('div', {});
   const genBtn = h('button', {class:'btn btn-dark btn-xs', onclick: () => generateAnglesFromReview(pid, p, r, card, genBtn)},
-    '✦ Generate Angles'
+    '+ Create Angle'
   );
   genWrap.appendChild(genBtn);
   footer.appendChild(genWrap);
@@ -668,198 +656,104 @@ function buildReviewCard(pid, p, r) {
   return card;
 }
 
-// Call Claude API to generate angles from a review
-async function generateAnglesFromReview(pid, p, review, card, btn) {
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span> Generating…';
+// Open a modal to create an angle inspired by a specific review
+function generateAnglesFromReview(pid, p, review, card, btn) {
+  var bg = mkBg();
+  var modal = h('div', {class:'modal'});
+  modal.appendChild(mkHead('Create Angle from Review', function(){ bg.remove(); }));
 
-  // Remove any existing generated angles
-  const existing = card.querySelector('.gen-angles-wrap');
-  if (existing) existing.remove();
+  var mb = h('div', {class:'modal-body'});
 
-  // Build strategy context
-  const strat = p.strategy || {};
-  const stratLines = Object.entries(strat).map(([k,v]) => {
-    const q = STRATEGY_QS.find(q=>q.id===k);
-    if (!q) return '';
-    const vals = Array.isArray(v) ? v.filter(Boolean) : [v].filter(Boolean);
-    if (!vals.length) return '';
-    return `${q.label}: ${vals.join(' / ')}`;
-  }).filter(Boolean).join('\n');
+  // Show the review as context at the top
+  var reviewCtx = h('div', {});
+  css(reviewCtx, {background:'var(--cream2)', borderRadius:'10px', padding:'12px 14px', marginBottom:'18px', fontSize:'12px', color:'#374151', lineHeight:'1.7'});
+  if (review.title) reviewCtx.appendChild(css(h('div', {}, '"' + review.title + '"'), {fontWeight:'700', marginBottom:'4px', color:'var(--ink)'}));
+  reviewCtx.appendChild(h('div', {}, review.body || ''));
+  var reviewMeta = h('div', {});
+  css(reviewMeta, {marginTop:'8px', fontSize:'11px', color:'var(--muted)', display:'flex', gap:'10px'});
+  reviewMeta.appendChild(h('span', {}, '— ' + (review.name || 'Anonymous')));
+  if (review.rating) reviewMeta.appendChild(h('span', {}, '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating)));
+  reviewCtx.appendChild(reviewMeta);
+  mb.appendChild(reviewCtx);
 
-  const prompt = `You are a creative strategist for Kopari Beauty, a premium skincare and beauty brand.
+  // Angle name
+  var nr = h('div', {class:'frow'});
+  nr.appendChild(h('label', {class:'flabel'}, 'Angle Name / Hook'));
+  var ni = h('input', {class:'finput', placeholder:'e.g. SPF that actually works for lazy girls'});
+  nr.appendChild(ni); mb.appendChild(nr);
 
-PRODUCT: ${p.name || 'Kopari product'}
-${stratLines ? 'STRATEGY CONTEXT:\n' + stratLines : ''}
+  // Notes
+  var wr = h('div', {class:'frow'});
+  wr.appendChild(h('label', {class:'flabel'}, 'Why this angle works (optional)'));
+  var wi = h('textarea', {class:'finput', placeholder:'What makes this review insight powerful for an ad…'});
+  wi.style.minHeight = '70px';
+  wr.appendChild(wi); mb.appendChild(wr);
 
-CUSTOMER REVIEW:
-Reviewer: ${review.name}
-Rating: ${review.rating}/5 stars
-Sentiment: ${review.sentiment}
-Title: "${review.title}"
-Review: "${review.body}"
+  // Color picker
+  var cr = h('div', {class:'frow'}); cr.appendChild(h('label', {class:'flabel'}, 'Color'));
+  var selColor = ANGLE_COLORS[Math.floor(Math.random() * ANGLE_COLORS.length)];
+  var cp = h('div', {class:'color-row'});
+  ANGLE_COLORS.forEach(function(c) {
+    var dot = css(h('div', {class:'cpick' + (selColor===c?' on':''), onclick: function(){
+      selColor = c;
+      cp.querySelectorAll('.cpick').forEach(function(d){ d.classList.remove('on'); });
+      dot.classList.add('on');
+    }}), {background:c});
+    cp.appendChild(dot);
+  });
+  cr.appendChild(cp); mb.appendChild(cr);
 
-Based on this specific review, generate exactly 3 ad angle ideas. Each angle should:
-- Use the customer's own language or emotional truth as a hook
-- Be specific to what THIS reviewer said (not generic)
-- Be actionable as a paid social ad concept (Meta/Instagram)
-
-Respond ONLY with valid JSON in this exact format, no markdown, no extra text:
-{
-  "angles": [
-    {"hook": "Short punchy hook (under 10 words)", "why": "1-2 sentences on why this angle works and how to execute it"},
-    {"hook": "Short punchy hook (under 10 words)", "why": "1-2 sentences on why this angle works and how to execute it"},
-    {"hook": "Short punchy hook (under 10 words)", "why": "1-2 sentences on why this angle works and how to execute it"}
-  ]
-}`;
-
-  // Get API key from Firebase (shared across all team members)
-  const apiKey = DB.settings && DB.settings.anthropicKey;
-  if (!apiKey) {
-    btn.disabled = false;
-    btn.innerHTML = '✦ Generate Angles';
-    openApiKeyModal();
-    return;
-  }
-
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 1000,
-        messages: [{ role: 'user', content: prompt }]
-      })
-    });
-    if (!res.ok) {
-      const errData = await res.json().catch(()=>({}));
-      throw new Error(errData.error?.message || 'API error ' + res.status);
-    }
-    const data = await res.json();
-    const raw = (data.content || []).map(c => c.text || '').join('');
-    const clean = raw.replace(/```json|```/g, '').trim();
-    const parsed = JSON.parse(clean);
-    const angles = parsed.angles || [];
-
-    // Render generated angles
-    const genWrap = h('div', {class:'gen-angles-wrap'});
-    genWrap.appendChild(h('div', {class:'gen-angles-title'}, '✦ Generated Angles from this Review'));
-    angles.forEach(angle => {
-      const item = h('div', {class:'gen-angle-item'});
-      const txt = h('div', {class:'gen-angle-text'});
-      txt.appendChild(h('div', {class:'gen-angle-hook'}, angle.hook));
-      txt.appendChild(h('div', {class:'gen-angle-why'}, angle.why));
-      item.appendChild(txt);
-      // Save angle button
-      const saveBtn = h('button', {class:'btn btn-dark btn-xs gen-angle-save', onclick: () => {
-        if (!DB.products[pid].angles) DB.products[pid].angles = {};
-        const nid = genId();
-        DB.products[pid].angles[nid] = {
-          name: angle.hook,
-          color: ANGLE_COLORS[Math.floor(Math.random()*ANGLE_COLORS.length)],
-          stage: 'Strategy',
-          sourceQuestion: null,
-          sourceAnswer: null,
-          sourceReview: review.body.slice(0, 120),
-          brief: { objective: angle.why, hooks: angle.hook },
-          tasks: []
-        };
-        save();
-        saveBtn.textContent = '✓ Saved';
-        saveBtn.disabled = true;
-        css(saveBtn, {background:'#dcfce7', color:'#166534'});
-      }}, '+ Save Angle');
-      item.appendChild(saveBtn);
-      genWrap.appendChild(item);
-    });
-    card.appendChild(genWrap);
-  } catch(e) {
-    const errWrap = h('div', {class:'gen-angles-wrap'});
-    errWrap.appendChild(css(h('div', {}, '⚠ Could not generate angles. Check your connection and try again.'), {fontSize:'12px', color:'var(--danger)', padding:'10px 0'}));
-    card.appendChild(errWrap);
-  }
-
-  btn.disabled = false;
-  btn.innerHTML = '↻ Regenerate';
-}
-
-
-// ── API KEY MODAL ──
-function openApiKeyModal() {
-  const existing = document.getElementById('apiKeyModal');
-  if (existing) { existing.remove(); }
-
-  const bg = mkBg();
-  bg.id = 'apiKeyModal';
-  const modal = h('div', {class:'modal'});
-  modal.appendChild(mkHead('AI Settings', () => bg.remove()));
-
-  const mb = h('div', {class:'modal-body'});
-
-  const info = h('div', {});
-  css(info, {background:'#FFF8E7', border:'1px solid #F0DFA0', borderRadius:'10px', padding:'12px 14px', marginBottom:'18px', fontSize:'12px', color:'#92650A', lineHeight:'1.6'});
-  info.innerHTML = '<strong>Shared across your whole team.</strong> Add your Anthropic API key once and everyone with access to this tool can use AI angle generation automatically. Get a key at <a href="https://console.anthropic.com" target="_blank" style="color:#B8953F;font-weight:700;">console.anthropic.com</a>.';
-  mb.appendChild(info);
-
-  const r = h('div', {class:'frow'});
-  r.appendChild(h('label', {class:'flabel'}, 'Anthropic API Key'));
-  const inp = h('input', {class:'finput', placeholder:'sk-ant-...'});
-  const saved = DB.settings && DB.settings.anthropicKey;
-  if (saved) inp.value = saved;
-  inp.type = 'password';
-  r.appendChild(inp);
-  mb.appendChild(r);
-
-  const toggle = h('button', {class:'btn btn-ghost btn-xs', onclick:()=>{
-    inp.type = inp.type === 'password' ? 'text' : 'password';
-    toggle.textContent = inp.type === 'password' ? 'Show' : 'Hide';
-  }}, 'Show');
-  css(toggle, {marginTop:'-8px', marginBottom:'12px'});
-  mb.appendChild(toggle);
+  // Stage picker
+  var sr = h('div', {class:'frow'}); sr.appendChild(h('label', {class:'flabel'}, 'Stage'));
+  var selStage = 'Strategy';
+  var sp = h('div', {class:'stage-picker'});
+  STAGES.forEach(function(s) {
+    var cfg = sc(s);
+    var sbtn = h('button', {class:'spick', onclick: function(){
+      selStage = s;
+      sp.querySelectorAll('.spick').forEach(function(b){ b.style.background=''; b.style.borderColor=''; b.style.color=''; });
+      Object.assign(sbtn.style, {background:cfg.bg, borderColor:cfg.color, color:cfg.color});
+    }}, s);
+    if (s === selStage) Object.assign(sbtn.style, {background:cfg.bg, borderColor:cfg.color, color:cfg.color});
+    sp.appendChild(sbtn);
+  });
+  sr.appendChild(sp); mb.appendChild(sr);
 
   modal.appendChild(mb);
-  const mf = h('div', {class:'modal-foot'});
-  if (saved) {
-    mf.appendChild(h('button', {class:'btn btn-danger', onclick:()=>{
-      if (!DB.settings) DB.settings = {};
-      delete DB.settings.anthropicKey;
-      save();
-      updateApiKeyBtn();
-      bg.remove();
-    }}, 'Remove Key'));
-  }
-  mf.appendChild(h('button', {class:'btn btn-ghost', onclick:()=>bg.remove()}, 'Cancel'));
-  mf.appendChild(h('button', {class:'btn btn-dark', onclick:()=>{
-    const key = inp.value.trim();
-    if (!key.startsWith('sk-')) { alert("Doesn't look like a valid key — should start with sk-ant-"); return; }
-    if (!DB.settings) DB.settings = {};
-    DB.settings.anthropicKey = key;
+  var mf = h('div', {class:'modal-foot'});
+  mf.appendChild(h('button', {class:'btn btn-ghost', onclick: function(){ bg.remove(); }}, 'Cancel'));
+  mf.appendChild(h('button', {class:'btn btn-dark', onclick: function(){
+    var name = ni.value.trim();
+    if (!name) return;
+    if (!DB.products[pid].angles) DB.products[pid].angles = {};
+    var nid = genId();
+    DB.products[pid].angles[nid] = {
+      name: name,
+      color: selColor,
+      stage: selStage,
+      sourceQuestion: null,
+      sourceAnswer: null,
+      sourceReview: (review.name || '') + ': "' + (review.body || '').slice(0, 120) + (review.body && review.body.length > 120 ? '…' : '') + '"',
+      brief: {
+        objective: wi.value.trim() || ('Inspired by review: "' + (review.title || review.body.slice(0,60)) + '"'),
+        hooks: name
+      },
+      tasks: []
+    };
     save();
-    updateApiKeyBtn();
     bg.remove();
-  }}, 'Save for Everyone'));
+    // Show confirmation on the button
+    btn.textContent = '✓ Angle Saved';
+    btn.disabled = true;
+    css(btn, {background:'#dcfce7', color:'#166534'});
+    setTimeout(function(){ btn.textContent = '+ Create Angle'; btn.disabled = false; css(btn, {background:'', color:''}); }, 3000);
+  }}, 'Save to Angles'));
   modal.appendChild(mf);
   bg.appendChild(modal);
   document.body.appendChild(bg);
-  setTimeout(() => inp.focus(), 50);
+  setTimeout(function(){ ni.focus(); }, 50);
 }
 
-function updateApiKeyBtn() {
-  const btn = document.getElementById('apiKeyBtn');
-  if (!btn) return;
-  const hasKey = DB.settings && DB.settings.anthropicKey;
-  btn.textContent = hasKey ? '✓ AI Ready' : '⚙ AI Key';
-  btn.style.color = hasKey ? '#6ee7b7' : 'rgba(255,255,255,0.6)';
-  btn.style.borderColor = hasKey ? 'rgba(110,231,183,0.3)' : 'rgba(255,255,255,0.15)';
-}
-
-// API key button updated after Firebase loads via updateApiKeyBtn()
 if(window.__fbReady)initFB();
 else document.addEventListener("fb-ready",initFB);
 </script>
