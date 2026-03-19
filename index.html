@@ -256,8 +256,8 @@ textarea.finput{resize:vertical;min-height:80px;line-height:1.6}
   <div class="page" id="mainPage"></div>
 </div>
 <script>
-const STAGES=["Strategy","Brief","Assigned","In Production","Live"];
-const STAGE_CFG={"Strategy":{bg:"#e0f7f7",color:"#0e7070"},"Brief":{bg:"#ede9fe",color:"#5b21b6"},"Assigned":{bg:"#fef9c3",color:"#854d0e"},"In Production":{bg:"#fce7f3",color:"#9d174d"},"Live":{bg:"#dcfce7",color:"#166534"}};
+const STAGES=["Strategy","Assigned","Complete"];
+const STAGE_CFG={"Strategy":{bg:"#e0f7f7",color:"#0e7070"},"Assigned":{bg:"#fef9c3",color:"#854d0e"},"Complete":{bg:"#dcfce7",color:"#166534"}};
 const ANGLE_COLORS=["#2ABFBF","#B8953F","#FF3EBF","#1B4B5A","#6366f1","#f97316","#84cc16","#ec4899","#14b8a6","#8b5cf6"];
 const CATEGORIES=["Suncare","Body","Face","Hair","Bundle","Limited Edition","Other"];
 const STRATEGY_QS=[
@@ -288,9 +288,9 @@ function fmtDate(ts){if(!ts)return"";return new Date(ts).toLocaleDateString("en-
 function dueCls(str){if(!str)return"";const d=new Date(str+"T00:00:00"),now=new Date();now.setHours(0,0,0,0);const diff=Math.round((d-now)/86400000);if(diff<0)return"late";if(diff<=3)return"soon";return"ok";}
 function render(){const page=document.getElementById("mainPage");const sy=window.scrollY;page.innerHTML="";if(VIEW.type==="overview")page.appendChild(buildOverview());else if(VIEW.type==="product"){const p=DB.products[VIEW.id];if(p)page.appendChild(buildDetail(VIEW.id,p));else{VIEW={type:"overview"};page.appendChild(buildOverview());}}window.scrollTo(0,sy);}
 function buildBC(items){const bc=h("div",{class:"breadcrumb"});items.forEach((item,i)=>{const el=h("span",{class:"bc-item"+(i===items.length-1?" active":"")},item.label);if(item.go)el.onclick=item.go;bc.appendChild(el);if(i<items.length-1)bc.appendChild(h("span",{class:"bc-sep"},"›"));});return bc;}
-function buildOverview(){const frag=document.createDocumentFragment();const prods=Object.entries(DB.products);const hdr=h("div",{class:"page-hdr"});const hL=h("div");hL.appendChild(h("div",{class:"page-title"},"Creative Strategy"));hL.appendChild(h("div",{class:"page-sub"},"Products  ›  Angles  ›  Reviews"));hdr.appendChild(hL);hdr.appendChild(h("button",{class:"btn btn-dark",onclick:()=>openProductModal()},"+ New Product"));frag.appendChild(hdr);const strip=h("div",{class:"stat-strip"});const totalA=prods.reduce((n,[,p])=>n+Object.keys(p.angles||{}).length,0);const liveA=prods.reduce((n,[,p])=>n+Object.values(p.angles||{}).filter(a=>a.stage==="Live").length,0);const inProd=prods.reduce((n,[,p])=>n+Object.values(p.angles||{}).filter(a=>a.stage==="In Production").length,0);const allT=prods.reduce((arr,[,p])=>arr.concat(...Object.values(p.angles||{}).map(a=>a.tasks||[])),[]);const doneT=allT.filter(t=>t.done).length;[["Products",prods.length,""],["Angles",totalA,""],["In Production",inProd,"accent"],["Live",liveA,""],["Tasks Done",`${doneT}/${allT.length}`,""]].forEach(([label,n,cls])=>{const c=h("div",{class:"stat-card"+(cls?" "+cls:"")});c.appendChild(h("div",{class:"stat-n"},String(n)));c.appendChild(h("div",{class:"stat-l"},label));strip.appendChild(c);});frag.appendChild(strip);const bar=h("div",{class:"filter-bar"});const grid=h("div",{class:"prod-grid"});function applyFilter(f){bar.querySelectorAll(".ftab").forEach(t=>t.classList.remove("on"));bar.querySelector(`[data-f="${f}"]`).classList.add("on");grid.innerHTML="";let filtered=prods;if(f!=="All")filtered=prods.filter(([,p])=>Object.values(p.angles||{}).some(a=>a.stage===f));if(!filtered.length){grid.appendChild(buildEmpty("No products yet","Use the button above to add your first product."));}else filtered.forEach(([id,p])=>grid.appendChild(buildPcard(id,p)));}["All",...STAGES].forEach(f=>{const t=h("button",{class:"ftab"},f);t.dataset.f=f;t.onclick=()=>applyFilter(f);bar.appendChild(t);});frag.appendChild(bar);applyFilter("All");frag.appendChild(grid);return frag;}
+function buildOverview(){const frag=document.createDocumentFragment();const prods=Object.entries(DB.products);const hdr=h("div",{class:"page-hdr"});const hL=h("div");hL.appendChild(h("div",{class:"page-title"},"Creative Strategy"));hL.appendChild(h("div",{class:"page-sub"},"Products  ›  Angles  ›  Reviews"));hdr.appendChild(hL);hdr.appendChild(h("button",{class:"btn btn-dark",onclick:()=>openProductModal()},"+ New Product"));frag.appendChild(hdr);const strip=h("div",{class:"stat-strip"});const totalA=prods.reduce((n,[,p])=>n+Object.keys(p.angles||{}).length,0);const liveA=prods.reduce((n,[,p])=>n+Object.values(p.angles||{}).filter(a=>a.stage==="Live").length,0);const inProd=prods.reduce((n,[,p])=>n+Object.values(p.angles||{}).filter(a=>a.stage==="Assigned").length,0);const allT=prods.reduce((arr,[,p])=>arr.concat(...Object.values(p.angles||{}).map(a=>a.tasks||[])),[]);const doneT=allT.filter(t=>t.done).length;[["Products",prods.length,""],["Angles",totalA,""],["Assigned",inProd,"accent"],["Live",liveA,""],["Tasks Done",`${doneT}/${allT.length}`,""]].forEach(([label,n,cls])=>{const c=h("div",{class:"stat-card"+(cls?" "+cls:"")});c.appendChild(h("div",{class:"stat-n"},String(n)));c.appendChild(h("div",{class:"stat-l"},label));strip.appendChild(c);});frag.appendChild(strip);const bar=h("div",{class:"filter-bar"});const grid=h("div",{class:"prod-grid"});function applyFilter(f){bar.querySelectorAll(".ftab").forEach(t=>t.classList.remove("on"));bar.querySelector(`[data-f="${f}"]`).classList.add("on");grid.innerHTML="";let filtered=prods;if(f!=="All")filtered=prods.filter(([,p])=>Object.values(p.angles||{}).some(a=>a.stage===f));if(!filtered.length){grid.appendChild(buildEmpty("No products yet","Use the button above to add your first product."));}else filtered.forEach(([id,p])=>grid.appendChild(buildPcard(id,p)));}["All",...STAGES].forEach(f=>{const t=h("button",{class:"ftab"},f);t.dataset.f=f;t.onclick=()=>applyFilter(f);bar.appendChild(t);});frag.appendChild(bar);applyFilter("All");frag.appendChild(grid);return frag;}
 function buildPcard(id,p){const angles=Object.entries(p.angles||{});const card=h("div",{class:"pcard",onclick:()=>{VIEW={type:"product",id};detailTab="angles";render();}});card.appendChild(h("div",{class:"pcard-stripe"}));const body=h("div",{class:"pcard-body"});const top=h("div",{class:"pcard-top"});top.appendChild(h("div",{class:"pcard-name"},p.name||"Untitled"));if(p.category)top.appendChild(h("div",{class:"pcard-cat"},p.category));body.appendChild(top);if(angles.length){const chips=h("div",{class:"angle-chips"});angles.slice(0,4).forEach(([,a])=>chips.appendChild(css(h("div",{class:"angle-chip"},a.name||"Angle"),{borderColor:a.color||"var(--border)",color:a.color||"var(--muted)",background:a.color?(a.color+"18"):"var(--cream2)"})));if(angles.length>4)chips.appendChild(css(h("div",{class:"angle-chip"},`+${angles.length-4} more`),{borderColor:"var(--border)",color:"var(--muted)"}));body.appendChild(chips);}const footer=h("div",{class:"pcard-footer"});const allT=angles.reduce((arr,[,a])=>arr.concat(a.tasks||[]),[]);const doneT=allT.filter(t=>t.done).length;footer.appendChild(h("span",{class:"task-summary"},allT.length?`✓ ${doneT}/${allT.length} tasks`:"No tasks"));const acts=h("div",{class:"pcard-acts"});acts.appendChild(h("button",{class:"btn btn-ghost btn-xs",onclick:e=>{e.stopPropagation();openProductModal(id,p);}},"Edit"));acts.appendChild(h("button",{class:"btn btn-danger btn-xs",onclick:e=>{e.stopPropagation();if(confirm("Delete "+p.name+"?")){delete DB.products[id];save();render();}}},"✕"));footer.appendChild(acts);body.appendChild(footer);card.appendChild(body);return card;}
-function buildDetail(id,p){const frag=document.createDocumentFragment();frag.appendChild(buildBC([{label:"All Products",go:()=>{VIEW={type:"overview"};render();}},{label:p.name||"Untitled"}]));const hdr=h("div",{class:"detail-hdr"});const hL=h("div",{style:"flex:1"});hL.appendChild(h("div",{class:"detail-name"},p.name||"Untitled"));const angles=Object.values(p.angles||{});hL.appendChild(h("div",{class:"detail-meta"},(p.category?p.category+" · ":"")+angles.length+" angle"+(angles.length===1?"":"s")+" · "+angles.filter(a=>a.stage==="Live").length+" live"));hdr.appendChild(hL);hdr.appendChild(h("div",{class:"hdr-actions"},h("button",{class:"btn btn-ghost btn-sm",onclick:()=>openProductModal(id,p)},"Edit"),h("button",{class:"btn btn-dark btn-sm",onclick:()=>openAngleModal(id,p,null)},"+ New Angle")));frag.appendChild(hdr);const itabs=h("div",{class:"itabs"});const reviews=Object.values(p.reviews||{});
+function buildDetail(id,p){const frag=document.createDocumentFragment();frag.appendChild(buildBC([{label:"All Products",go:()=>{VIEW={type:"overview"};render();}},{label:p.name||"Untitled"}]));const hdr=h("div",{class:"detail-hdr"});const hL=h("div",{style:"flex:1"});hL.appendChild(h("div",{class:"detail-name"},p.name||"Untitled"));const angles=Object.values(p.angles||{});hL.appendChild(h("div",{class:"detail-meta"},(p.category?p.category+" · ":"")+angles.length+" angle"+(angles.length===1?"":"s")+" · "+angles.filter(a=>a.stage==="Complete").length+" complete"));hdr.appendChild(hL);hdr.appendChild(h("div",{class:"hdr-actions"},h("button",{class:"btn btn-ghost btn-sm",onclick:()=>openProductModal(id,p)},"Edit"),h("button",{class:"btn btn-dark btn-sm",onclick:()=>openAngleModal(id,p,null)},"+ New Angle")));frag.appendChild(hdr);const itabs=h("div",{class:"itabs"});const reviews=Object.values(p.reviews||{});
   const tabs=[{id:"angles",label:"Angles"+(angles.length?" ("+angles.length+")":"")},{id:"reviews",label:"Reviews"+(reviews.length?" ("+reviews.length+")":"")}];const content=h("div");function showTab(tid){detailTab=tid;itabs.querySelectorAll(".itab").forEach((t,i)=>t.classList.toggle("on",tabs[i].id===tid));content.innerHTML="";if(tid==="angles")content.appendChild(buildAnglesSection(id,p));if(tid==="reviews")content.appendChild(buildReviewsSection(id,p));}tabs.forEach(t=>itabs.appendChild(h("button",{class:"itab"+(t.id===detailTab?" on":""),onclick:()=>showTab(t.id)},t.label)));frag.appendChild(itabs);
   // Collapsible strategy section always available above tab content
   var sWrap=h("div",{});
@@ -309,21 +309,25 @@ function buildAnglesSection(id,p){const wrap=h("div");const shdr=h("div",{class:
 function buildAngleCard(pid, p, aid, angle) {
   var isOpen = !!openAngles[aid];
   var cfg    = sc(angle.stage || "Strategy");
-  var isDone = !!angle.done;
+  var isDone = angle.stage === "Complete";
 
   var card = h("div", {class:"angle-card"});
-  if (isDone) card.style.opacity = "0.65";
+  if (isDone) card.style.opacity = "0.7";
 
-  // ── Top row (always visible) ──
+  // ── Top row ──
   var top = h("div", {class:"angle-card-top", onclick:function(){ openAngles[aid]=!openAngles[aid]; render(); }});
   top.appendChild(css(h("div",{class:"angle-dot"}),{background:angle.color||"var(--teal)"}));
   top.appendChild(h("div",{class:"angle-title"},angle.name||"Untitled Angle"));
-
   var meta = h("div",{class:"angle-meta"});
   meta.appendChild(css(h("span",{class:"stage-pill"},angle.stage||"Strategy"),{background:cfg.bg,color:cfg.color}));
-  if (isDone) meta.appendChild(css(h("span",{},"✓ Done"),{fontSize:"11px",color:"#166534",fontWeight:"700"}));
+  if (angle.assignedTo) meta.appendChild(css(h("span",{},"👤 "+angle.assignedTo),{fontSize:"11px",color:"var(--muted)",fontWeight:"500"}));
+  if (angle.dueDate) {
+    var dc = dueCls(angle.dueDate);
+    meta.appendChild(h("span",{class:"t-due "+(dc||"ok")},
+      dc==="late"?"⚠ overdue":dc==="soon"?"⏰ due soon":"📅 "+angle.dueDate
+    ));
+  }
   top.appendChild(meta);
-
   var acts = h("div",{class:"angle-actions"});
   acts.appendChild(h("button",{class:"icon-btn",onclick:function(e){e.stopPropagation();openAngleModal(pid,p,aid,angle);}},"✎"));
   acts.appendChild(h("button",{class:"icon-btn del",onclick:function(e){e.stopPropagation();if(confirm("Delete angle?")){delete DB.products[pid].angles[aid];save();render();}}},"✕"));
@@ -334,7 +338,7 @@ function buildAngleCard(pid, p, aid, angle) {
   // ── Expanded body ──
   var body = h("div",{class:"angle-body"+(isOpen?" open":"")});
 
-  // Branched from banner
+  // Branched from / inspired by review banner
   if (angle.sourceQuestion || angle.sourceReview) {
     var banner = h("div",{class:"source-banner"});
     if (angle.sourceQuestion) {
@@ -343,13 +347,13 @@ function buildAngleCard(pid, p, aid, angle) {
       banner.appendChild(document.createTextNode(sq?sq.label:angle.sourceQuestion));
       if (angle.sourceAnswer) banner.appendChild(h("div",{class:"source-quote"},'"'+angle.sourceAnswer+'"'));
     } else if (angle.sourceReview) {
-      banner.appendChild(h("strong",{},"Inspired by review: "));
+      banner.appendChild(h("strong",{},"💬 From a customer review: "));
       banner.appendChild(h("div",{class:"source-quote"},'"'+angle.sourceReview+'"'));
     }
     body.appendChild(banner);
   }
 
-  // ── Stage pipeline ──
+  // ── 3-stage pipeline ──
   var pipeline = h("div",{class:"pipeline"});
   var curIdx = STAGES.indexOf(angle.stage||"Strategy");
   STAGES.forEach(function(s,i){
@@ -365,56 +369,83 @@ function buildAngleCard(pid, p, aid, angle) {
   });
   body.appendChild(pipeline);
 
-  // ── Single content area ──
-  var contentGrid = h("div",{});
-  css(contentGrid,{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"12px",marginBottom:"16px"});
-
   // Created date
   if (angle.createdAt) {
-    var datePill = h("div",{class:"brief-date-pill"});
-    datePill.textContent = "📅 Created " + fmtDate(angle.createdAt);
-    css(datePill,{gridColumn:"1/-1"});
-    contentGrid.appendChild(datePill);
+    body.appendChild(h("div",{class:"brief-date-pill"},"📅 Created "+fmtDate(angle.createdAt)));
   }
 
-  // Objective
-  contentGrid.appendChild(buildAngleField(pid, aid, "objective", "Objective", "What's the goal of this content?", false));
-  // Hook Ideas
-  contentGrid.appendChild(buildAngleField(pid, aid, "hooks", "Hook Ideas", "Opening lines or visual hooks to test…", false));
-  // Copy Notes
-  contentGrid.appendChild(buildAngleField(pid, aid, "copy", "Copy Notes", "Key phrases, proof points, copy direction…", false));
-  // Assigned To
-  contentGrid.appendChild(buildAngleField(pid, aid, "assignedTo", "Assigned To", "e.g. Amber", false));
-  // Final Asset Link (full width)
-  var linkField = buildAngleField(pid, aid, "assetLink", "Final Asset Link", "Paste a link to the finished content…", false);
-  css(linkField,{gridColumn:"1/-1"});
-  contentGrid.appendChild(linkField);
+  // ── STRATEGY fields ──
+  var stratSection = h("div",{});
+  css(stratSection,{marginTop:"14px"});
+  stratSection.appendChild(css(h("div",{},"Strategy"),{fontSize:"10px",fontWeight:"700",letterSpacing:".1em",textTransform:"uppercase",color:"var(--subtle)",marginBottom:"10px"}));
+  var stratGrid = h("div",{});
+  css(stratGrid,{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"12px"});
+  stratGrid.appendChild(buildAngleField(pid,aid,"objective","Objective","What's the goal of this content?"));
+  stratGrid.appendChild(buildAngleField(pid,aid,"hooks","Hook Ideas","Opening lines or visual hooks to test…"));
+  var copyField = buildAngleField(pid,aid,"copy","Copy Notes","Key phrases, proof points, copy direction…");
+  css(copyField,{gridColumn:"1/-1"});
+  stratGrid.appendChild(copyField);
+  stratSection.appendChild(stratGrid);
+  body.appendChild(stratSection);
 
-  body.appendChild(contentGrid);
+  // ── ASSIGNED fields ──
+  var assignSection = h("div",{});
+  css(assignSection,{marginTop:"18px",paddingTop:"16px",borderTop:"1px solid var(--cream2)"});
+  assignSection.appendChild(css(h("div",{},"Assignment"),{fontSize:"10px",fontWeight:"700",letterSpacing:".1em",textTransform:"uppercase",color:"var(--subtle)",marginBottom:"10px"}));
+  var assignGrid = h("div",{});
+  css(assignGrid,{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"12px"});
+  assignGrid.appendChild(buildAngleField(pid,aid,"assignedTo","Assigned To","e.g. Amber"));
 
-  // ── Done toggle ──
+  // Due date — native date input
+  var duWrap = h("div",{class:"brief-field"});
+  duWrap.appendChild(h("div",{class:"brief-lbl"},"Due Date"));
+  var duInp = h("input",{class:"answer-txt",type:"date"});
+  duInp.style.marginTop = "4px";
+  duInp.style.width = "100%";
+  duInp.value = angle.dueDate || "";
+  duInp.onchange = function(e){
+    DB.products[pid].angles[aid].dueDate = e.target.value;
+    save();
+  };
+  duWrap.appendChild(duInp);
+  assignGrid.appendChild(duWrap);
+  assignSection.appendChild(assignGrid);
+  body.appendChild(assignSection);
+
+  // ── COMPLETE section ──
+  var completeSection = h("div",{});
+  css(completeSection,{marginTop:"18px",paddingTop:"16px",borderTop:"1px solid var(--cream2)"});
+  completeSection.appendChild(css(h("div",{},"Completion"),{fontSize:"10px",fontWeight:"700",letterSpacing:".1em",textTransform:"uppercase",color:"var(--subtle)",marginBottom:"10px"}));
+
+  var assetField = buildAngleField(pid,aid,"assetLink","Final Asset Link","Paste a link to the finished content…");
+  css(assetField,{marginBottom:"12px"});
+  completeSection.appendChild(assetField);
+
+  // Done toggle + view link
   var doneRow = h("div",{});
-  css(doneRow,{display:"flex",alignItems:"center",justifyContent:"space-between",paddingTop:"12px",borderTop:"1px solid var(--cream2)"});
+  css(doneRow,{display:"flex",alignItems:"center",justifyContent:"space-between"});
   var doneChk = h("div",{class:"tchk"+(isDone?" done":""),onclick:function(){
-    DB.products[pid].angles[aid].done = !DB.products[pid].angles[aid].done;
+    var next = angle.stage === "Complete" ? "Strategy" : "Complete";
+    DB.products[pid].angles[aid].stage = next;
     save(); render();
   }});
   if (isDone) doneChk.textContent = "✓";
-  var doneLabel = h("label",{},isDone ? "Marked as complete" : "Mark as complete");
+  var doneLabel = h("label",{});
   css(doneLabel,{fontSize:"12px",color:"var(--muted)",fontWeight:"600",cursor:"pointer",display:"flex",alignItems:"center",gap:"8px"});
-  doneLabel.prepend(doneChk);
+  doneLabel.appendChild(doneChk);
+  doneLabel.appendChild(document.createTextNode(isDone?"Marked as complete — click to reopen":"Mark as complete"));
   doneRow.appendChild(doneLabel);
-
-  // Show asset link as clickable if filled
   if (angle.assetLink) {
     var linkBtn = h("a",{href:angle.assetLink,target:"_blank",class:"btn btn-ghost btn-xs"},"🔗 View Asset");
     doneRow.appendChild(linkBtn);
   }
-  body.appendChild(doneRow);
+  completeSection.appendChild(doneRow);
+  body.appendChild(completeSection);
 
   card.appendChild(body);
   return card;
 }
+
 
 // Inline editable field for angle content
 function buildAngleField(pid, aid, fieldKey, label, placeholder, fullWidth) {
