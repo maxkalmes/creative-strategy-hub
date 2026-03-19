@@ -288,7 +288,7 @@ function fmtDate(ts){if(!ts)return"";return new Date(ts).toLocaleDateString("en-
 function dueCls(str){if(!str)return"";const d=new Date(str+"T00:00:00"),now=new Date();now.setHours(0,0,0,0);const diff=Math.round((d-now)/86400000);if(diff<0)return"late";if(diff<=3)return"soon";return"ok";}
 function render(){const page=document.getElementById("mainPage");const sy=window.scrollY;page.innerHTML="";if(VIEW.type==="overview")page.appendChild(buildOverview());else if(VIEW.type==="product"){const p=DB.products[VIEW.id];if(p)page.appendChild(buildDetail(VIEW.id,p));else{VIEW={type:"overview"};page.appendChild(buildOverview());}}window.scrollTo(0,sy);}
 function buildBC(items){const bc=h("div",{class:"breadcrumb"});items.forEach((item,i)=>{const el=h("span",{class:"bc-item"+(i===items.length-1?" active":"")},item.label);if(item.go)el.onclick=item.go;bc.appendChild(el);if(i<items.length-1)bc.appendChild(h("span",{class:"bc-sep"},"›"));});return bc;}
-function buildOverview(){const frag=document.createDocumentFragment();const prods=Object.entries(DB.products);const hdr=h("div",{class:"page-hdr"});const hL=h("div");hL.appendChild(h("div",{class:"page-title"},"Creative Strategy"));hL.appendChild(h("div",{class:"page-sub"},"Products  ›  Strategy  ›  Angles  ›  Brief + Tasks"));hdr.appendChild(hL);hdr.appendChild(h("button",{class:"btn btn-dark",onclick:()=>openProductModal()},"+ New Product"));frag.appendChild(hdr);const strip=h("div",{class:"stat-strip"});const totalA=prods.reduce((n,[,p])=>n+Object.keys(p.angles||{}).length,0);const liveA=prods.reduce((n,[,p])=>n+Object.values(p.angles||{}).filter(a=>a.stage==="Live").length,0);const inProd=prods.reduce((n,[,p])=>n+Object.values(p.angles||{}).filter(a=>a.stage==="In Production").length,0);const allT=prods.reduce((arr,[,p])=>arr.concat(...Object.values(p.angles||{}).map(a=>a.tasks||[])),[]);const doneT=allT.filter(t=>t.done).length;[["Products",prods.length,""],["Angles",totalA,""],["In Production",inProd,"accent"],["Live",liveA,""],["Tasks Done",`${doneT}/${allT.length}`,""]].forEach(([label,n,cls])=>{const c=h("div",{class:"stat-card"+(cls?" "+cls:"")});c.appendChild(h("div",{class:"stat-n"},String(n)));c.appendChild(h("div",{class:"stat-l"},label));strip.appendChild(c);});frag.appendChild(strip);const bar=h("div",{class:"filter-bar"});const grid=h("div",{class:"prod-grid"});function applyFilter(f){bar.querySelectorAll(".ftab").forEach(t=>t.classList.remove("on"));bar.querySelector(`[data-f="${f}"]`).classList.add("on");grid.innerHTML="";let filtered=prods;if(f!=="All")filtered=prods.filter(([,p])=>Object.values(p.angles||{}).some(a=>a.stage===f));if(!filtered.length){grid.appendChild(buildEmpty("No products yet","Use the button above to add your first product."));}else filtered.forEach(([id,p])=>grid.appendChild(buildPcard(id,p)));}["All",...STAGES].forEach(f=>{const t=h("button",{class:"ftab"},f);t.dataset.f=f;t.onclick=()=>applyFilter(f);bar.appendChild(t);});frag.appendChild(bar);applyFilter("All");frag.appendChild(grid);return frag;}
+function buildOverview(){const frag=document.createDocumentFragment();const prods=Object.entries(DB.products);const hdr=h("div",{class:"page-hdr"});const hL=h("div");hL.appendChild(h("div",{class:"page-title"},"Creative Strategy"));hL.appendChild(h("div",{class:"page-sub"},"Products  ›  Angles  ›  Reviews"));hdr.appendChild(hL);hdr.appendChild(h("button",{class:"btn btn-dark",onclick:()=>openProductModal()},"+ New Product"));frag.appendChild(hdr);const strip=h("div",{class:"stat-strip"});const totalA=prods.reduce((n,[,p])=>n+Object.keys(p.angles||{}).length,0);const liveA=prods.reduce((n,[,p])=>n+Object.values(p.angles||{}).filter(a=>a.stage==="Live").length,0);const inProd=prods.reduce((n,[,p])=>n+Object.values(p.angles||{}).filter(a=>a.stage==="In Production").length,0);const allT=prods.reduce((arr,[,p])=>arr.concat(...Object.values(p.angles||{}).map(a=>a.tasks||[])),[]);const doneT=allT.filter(t=>t.done).length;[["Products",prods.length,""],["Angles",totalA,""],["In Production",inProd,"accent"],["Live",liveA,""],["Tasks Done",`${doneT}/${allT.length}`,""]].forEach(([label,n,cls])=>{const c=h("div",{class:"stat-card"+(cls?" "+cls:"")});c.appendChild(h("div",{class:"stat-n"},String(n)));c.appendChild(h("div",{class:"stat-l"},label));strip.appendChild(c);});frag.appendChild(strip);const bar=h("div",{class:"filter-bar"});const grid=h("div",{class:"prod-grid"});function applyFilter(f){bar.querySelectorAll(".ftab").forEach(t=>t.classList.remove("on"));bar.querySelector(`[data-f="${f}"]`).classList.add("on");grid.innerHTML="";let filtered=prods;if(f!=="All")filtered=prods.filter(([,p])=>Object.values(p.angles||{}).some(a=>a.stage===f));if(!filtered.length){grid.appendChild(buildEmpty("No products yet","Use the button above to add your first product."));}else filtered.forEach(([id,p])=>grid.appendChild(buildPcard(id,p)));}["All",...STAGES].forEach(f=>{const t=h("button",{class:"ftab"},f);t.dataset.f=f;t.onclick=()=>applyFilter(f);bar.appendChild(t);});frag.appendChild(bar);applyFilter("All");frag.appendChild(grid);return frag;}
 function buildPcard(id,p){const angles=Object.entries(p.angles||{});const card=h("div",{class:"pcard",onclick:()=>{VIEW={type:"product",id};detailTab="angles";render();}});card.appendChild(h("div",{class:"pcard-stripe"}));const body=h("div",{class:"pcard-body"});const top=h("div",{class:"pcard-top"});top.appendChild(h("div",{class:"pcard-name"},p.name||"Untitled"));if(p.category)top.appendChild(h("div",{class:"pcard-cat"},p.category));body.appendChild(top);if(angles.length){const chips=h("div",{class:"angle-chips"});angles.slice(0,4).forEach(([,a])=>chips.appendChild(css(h("div",{class:"angle-chip"},a.name||"Angle"),{borderColor:a.color||"var(--border)",color:a.color||"var(--muted)",background:a.color?(a.color+"18"):"var(--cream2)"})));if(angles.length>4)chips.appendChild(css(h("div",{class:"angle-chip"},`+${angles.length-4} more`),{borderColor:"var(--border)",color:"var(--muted)"}));body.appendChild(chips);}const footer=h("div",{class:"pcard-footer"});const allT=angles.reduce((arr,[,a])=>arr.concat(a.tasks||[]),[]);const doneT=allT.filter(t=>t.done).length;footer.appendChild(h("span",{class:"task-summary"},allT.length?`✓ ${doneT}/${allT.length} tasks`:"No tasks"));const acts=h("div",{class:"pcard-acts"});acts.appendChild(h("button",{class:"btn btn-ghost btn-xs",onclick:e=>{e.stopPropagation();openProductModal(id,p);}},"Edit"));acts.appendChild(h("button",{class:"btn btn-danger btn-xs",onclick:e=>{e.stopPropagation();if(confirm("Delete "+p.name+"?")){delete DB.products[id];save();render();}}},"✕"));footer.appendChild(acts);body.appendChild(footer);card.appendChild(body);return card;}
 function buildDetail(id,p){const frag=document.createDocumentFragment();frag.appendChild(buildBC([{label:"All Products",go:()=>{VIEW={type:"overview"};render();}},{label:p.name||"Untitled"}]));const hdr=h("div",{class:"detail-hdr"});const hL=h("div",{style:"flex:1"});hL.appendChild(h("div",{class:"detail-name"},p.name||"Untitled"));const angles=Object.values(p.angles||{});hL.appendChild(h("div",{class:"detail-meta"},(p.category?p.category+" · ":"")+angles.length+" angle"+(angles.length===1?"":"s")+" · "+angles.filter(a=>a.stage==="Live").length+" live"));hdr.appendChild(hL);hdr.appendChild(h("div",{class:"hdr-actions"},h("button",{class:"btn btn-ghost btn-sm",onclick:()=>openProductModal(id,p)},"Edit"),h("button",{class:"btn btn-dark btn-sm",onclick:()=>openAngleModal(id,p,null)},"+ New Angle")));frag.appendChild(hdr);const itabs=h("div",{class:"itabs"});const reviews=Object.values(p.reviews||{});
   const tabs=[{id:"angles",label:"Angles"+(angles.length?" ("+angles.length+")":"")},{id:"reviews",label:"Reviews"+(reviews.length?" ("+reviews.length+")":"")}];const content=h("div");function showTab(tid){detailTab=tid;itabs.querySelectorAll(".itab").forEach((t,i)=>t.classList.toggle("on",tabs[i].id===tid));content.innerHTML="";if(tid==="angles")content.appendChild(buildAnglesSection(id,p));if(tid==="reviews")content.appendChild(buildReviewsSection(id,p));}tabs.forEach(t=>itabs.appendChild(h("button",{class:"itab"+(t.id===detailTab?" on":""),onclick:()=>showTab(t.id)},t.label)));frag.appendChild(itabs);
@@ -305,466 +305,142 @@ function buildDetail(id,p){const frag=document.createDocumentFragment();frag.app
   showTab(detailTab);frag.appendChild(content);return frag;}
 function buildStrategySection(id,p){const wrap=h("div");wrap.appendChild(h("p",{class:"strat-intro"},"Answer each question — add as many answers as you like. Each answer can become its own angle."));const grid=h("div",{class:"strat-grid"});STRATEGY_QS.forEach(q=>grid.appendChild(buildSqCard(id,p,q)));wrap.appendChild(grid);return wrap;}
 function buildSqCard(pid,p,q){const card=h("div",{class:"sq-card"});const sqH=h("div",{class:"sq-header"});sqH.appendChild(h("div",{class:"sq-q"},q.label));sqH.appendChild(h("span",{class:"sq-tag "+TAG_CLS[q.tag]},q.tagLabel));card.appendChild(sqH);const answersDiv=h("div",{class:"sq-answers"});function renderAnswers(){answersDiv.innerHTML="";const vals=DB.products[pid].strategy?.[q.id]||[""];vals.forEach((val,i)=>{const row=h("div",{class:"answer-row"});const ta=h("textarea",{class:"answer-txt",placeholder:"Your answer…"});ta.value=val;ta.rows=2;ta.oninput=e=>{if(!DB.products[pid].strategy)DB.products[pid].strategy={};if(!DB.products[pid].strategy[q.id])DB.products[pid].strategy[q.id]=[];DB.products[pid].strategy[q.id][i]=e.target.value;save();};row.appendChild(ta);if(vals.length>1){const del=h("button",{class:"answer-del",title:"Remove",onclick:()=>{DB.products[pid].strategy[q.id].splice(i,1);save();renderAnswers();}},"×");row.appendChild(del);}answersDiv.appendChild(row);});const add=h("button",{class:"add-answer-btn",onclick:()=>{if(!DB.products[pid].strategy)DB.products[pid].strategy={};if(!DB.products[pid].strategy[q.id])DB.products[pid].strategy[q.id]=[];DB.products[pid].strategy[q.id].push("");save();renderAnswers();}},"+ Add another answer");answersDiv.appendChild(add);}renderAnswers();card.appendChild(answersDiv);return card;}
-function buildAnglesSection(id,p){const wrap=h("div");const shdr=h("div",{class:"sec-hdr"});shdr.appendChild(h("span",{class:"sec-desc"},"Each angle branches from a strategy answer and gets its own brief + tasks."));shdr.appendChild(h("button",{class:"btn btn-dark btn-sm",onclick:()=>openAngleModal(id,p,null)},"+ New Angle"));wrap.appendChild(shdr);const angles=Object.entries(p.angles||{});if(!angles.length){wrap.appendChild(buildEmpty("No angles yet","Create an angle to start building briefs and tasks."));return wrap;}const list=h("div",{class:"angles-wrap"});angles.forEach(([aid,angle])=>list.appendChild(buildAngleCard(id,p,aid,angle)));wrap.appendChild(list);return wrap;}
-function buildAngleCard(pid,p,aid,angle){const isOpen=!!openAngles[aid];const cfg=sc(angle.stage||"Strategy");const tasks=angle.tasks||[];const done=tasks.filter(t=>t.done).length;const card=h("div",{class:"angle-card"});const top=h("div",{class:"angle-card-top",onclick:()=>{openAngles[aid]=!openAngles[aid];render();}});top.appendChild(css(h("div",{class:"angle-dot"}),{background:angle.color||"var(--teal)"}));top.appendChild(h("div",{class:"angle-title"},angle.name||"Untitled Angle"));const meta=h("div",{class:"angle-meta"});meta.appendChild(css(h("span",{class:"stage-pill"},angle.stage||"Strategy"),{background:cfg.bg,color:cfg.color}));if(tasks.length)meta.appendChild(css(h("span",{},`${done}/${tasks.length} tasks`),{fontSize:"11px",color:"var(--subtle)",fontWeight:"500"}));top.appendChild(meta);const acts=h("div",{class:"angle-actions"});acts.appendChild(h("button",{class:"icon-btn",onclick:e=>{e.stopPropagation();openAngleModal(pid,p,aid,angle);}},"✎"));acts.appendChild(h("button",{class:"icon-btn del",onclick:e=>{e.stopPropagation();if(confirm("Delete angle?")){delete DB.products[pid].angles[aid];save();render();}}},"✕"));top.appendChild(acts);top.appendChild(css(h("span",{},isOpen?"▲":"▼"),{fontSize:"10px",color:"var(--subtle)",marginLeft:"4px",flexShrink:"0"}));card.appendChild(top);const body=h("div",{class:"angle-body"+(isOpen?" open":"")});if(angle.sourceQuestion){const sq=STRATEGY_QS.find(q=>q.id===angle.sourceQuestion);const banner=h("div",{class:"source-banner"});banner.appendChild(h("strong",{},"Branched from: "));banner.appendChild(document.createTextNode(sq?.label||angle.sourceQuestion));if(angle.sourceAnswer)banner.appendChild(h("div",{class:"source-quote"},`"${angle.sourceAnswer}"`));body.appendChild(banner);}const pipeline=h("div",{class:"pipeline"});const curIdx=STAGES.indexOf(angle.stage||"Strategy");STAGES.forEach((s,i)=>{const c2=sc(s);const isAct=i===curIdx,wasDone=i<curIdx;pipeline.appendChild(css(h("button",{class:"pip-btn",onclick:e=>{e.stopPropagation();DB.products[pid].angles[aid].stage=s;save();render();}},s),{background:isAct?"var(--ink)":wasDone?c2.bg:"var(--cream2)",color:isAct?"var(--gold2)":wasDone?c2.color:"var(--subtle)"}));});body.appendChild(pipeline);const btabs=h("div",{class:"btabs"});let aTab=angle._aTab||"brief";const bcontent=h("div");function showBT(t){angle._aTab=t;btabs.querySelectorAll(".btab").forEach((b,i)=>b.classList.toggle("on",["brief","tasks"][i]===t));bcontent.innerHTML="";if(t==="brief")bcontent.appendChild(buildBrief(pid,aid,angle));if(t==="tasks")bcontent.appendChild(buildTasks(pid,aid,angle));}btabs.appendChild(h("button",{class:"btab"+(aTab==="brief"?" on":""),onclick:()=>showBT("brief")},"Brief"));btabs.appendChild(h("button",{class:"btab"+(aTab==="tasks"?" on":""),onclick:()=>showBT("tasks")},"Tasks"+(tasks.length?" ("+tasks.length+")":"")));body.appendChild(btabs);showBT(aTab);body.appendChild(bcontent);card.appendChild(body);return card;}
-function buildBrief(pid,aid,angle){const wrap=h("div");const shdr=h("div",{class:"sec-hdr"});shdr.appendChild(h("span",{class:"sec-desc"},"Creative brief for this angle."));shdr.appendChild(h("button",{class:"btn btn-dark btn-xs",onclick:()=>openBriefModal(pid,aid,angle)},"Edit Brief"));wrap.appendChild(shdr);const brief=angle.brief||{};if(brief.createdAt)wrap.appendChild(h("div",{class:"brief-date-pill"},"📅 Briefed "+fmtDate(brief.createdAt)));const FIELDS=[{key:"objective",label:"Objective"},{key:"formats",label:"Content Formats"},{key:"hooks",label:"Hook Ideas"},{key:"copy",label:"Copy Notes"}];if(!FIELDS.some(f=>brief[f.key]?.trim())){wrap.appendChild(buildEmpty("No brief yet","Click Edit Brief to fill in the details."));return wrap;}const grid=h("div",{class:"brief-grid"});FIELDS.forEach(f=>{const c=h("div",{class:"brief-field"});c.appendChild(h("div",{class:"brief-lbl"},f.label));c.appendChild(brief[f.key]?h("div",{class:"brief-val"},brief[f.key]):h("div",{class:"brief-nil"},"Not filled in yet"));grid.appendChild(c);});wrap.appendChild(grid);return wrap;}
-function buildTasks(pid,aid,angle){const wrap=h("div");const shdr=h("div",{class:"sec-hdr"});shdr.appendChild(h("span",{class:"sec-desc"},"Tasks for this angle."));shdr.appendChild(h("button",{class:"btn btn-dark btn-xs",onclick:()=>openTaskModal(pid,aid,angle,null)},"+ Add Task"));wrap.appendChild(shdr);const tasks=angle.tasks||[];if(!tasks.length){wrap.appendChild(buildEmpty("No tasks yet","Add tasks to track production work."));return wrap;}const list=h("div",{class:"tasks-list"});tasks.forEach((t,i)=>{const row=h("div",{class:"task-row"});const chk=h("div",{class:"tchk"+(t.done?" done":""),onclick:()=>{DB.products[pid].angles[aid].tasks[i].done=!t.done;save();render();}});if(t.done)chk.textContent="✓";row.appendChild(chk);const tbody=h("div",{class:"tbody"});tbody.appendChild(h("div",{class:"t-title"+(t.done?" done":"")},t.title||""));const meta=h("div",{class:"t-meta"});if(t.assignee)meta.appendChild(h("span",{class:"t-assignee"},"👤 "+t.assignee));if(t.assignedAt)meta.appendChild(h("span",{class:"t-assigned"},"assigned "+fmtDate(t.assignedAt)));if(t.due){const dc=dueCls(t.due);meta.appendChild(h("span",{class:"t-due "+dc},dc==="late"?"⚠ overdue: "+t.due:dc==="soon"?"⏰ due soon: "+t.due:"📅 due "+t.due));}if(meta.children.length)tbody.appendChild(meta);row.appendChild(tbody);const acts=h("div",{class:"t-acts"});acts.appendChild(h("button",{class:"icon-btn",onclick:()=>openTaskModal(pid,aid,angle,i)},"✎"));acts.appendChild(h("button",{class:"icon-btn del",onclick:()=>{DB.products[pid].angles[aid].tasks.splice(i,1);save();render();}},"✕"));row.appendChild(acts);list.appendChild(row);});wrap.appendChild(list);return wrap;}
-function buildEmpty(title,sub){const el=h("div",{class:"empty"});el.appendChild(h("div",{class:"empty-icon"},"✦"));el.appendChild(h("div",{class:"empty-txt"},title));el.appendChild(h("div",{class:"empty-sub"},sub));return el;}
-function mkBg(){const bg=h("div",{class:"modal-bg"});bg.onclick=e=>{if(e.target===bg)bg.remove();};return bg;}
-function mkHead(title,onClose){const mh=h("div",{class:"modal-head"});mh.appendChild(h("div",{class:"modal-title"},title));mh.appendChild(h("button",{class:"modal-close",onclick:onClose},"×"));return mh;}
-function openProductModal(id=null,p=null){const isEdit=!!id;const bg=mkBg();const modal=h("div",{class:"modal"});modal.appendChild(mkHead(isEdit?"Edit Product":"New Product",()=>bg.remove()));const mb=h("div",{class:"modal-body"});const nr=h("div",{class:"frow"});nr.appendChild(h("label",{class:"flabel"},"Product / Bundle Name"));const ni=h("input",{class:"finput",placeholder:"e.g. Sun Veil Illuminating Elixir SPF 38",value:p?.name||""});nr.appendChild(ni);mb.appendChild(nr);const cr=h("div",{class:"frow"});cr.appendChild(h("label",{class:"flabel"},"Category"));const cs=h("select",{class:"finput"});CATEGORIES.forEach(c=>{const o=h("option",{value:c},c);if(p?.category===c)o.selected=true;cs.appendChild(o);});cr.appendChild(cs);mb.appendChild(cr);modal.appendChild(mb);const mf=h("div",{class:"modal-foot"});mf.appendChild(h("button",{class:"btn btn-ghost",onclick:()=>bg.remove()},"Cancel"));mf.appendChild(h("button",{class:"btn btn-dark",onclick:()=>{const name=ni.value.trim();if(!name)return;if(isEdit){DB.products[id].name=name;DB.products[id].category=cs.value;}else{const nid=genId();DB.products[nid]={name,category:cs.value,strategy:{},angles:{}};}save();render();bg.remove();}},"Create Product" ));modal.appendChild(mf);bg.appendChild(modal);document.body.appendChild(bg);setTimeout(()=>ni.focus(),50);}
-function openAngleModal(pid,p,aid=null,angle=null){const isEdit=!!aid;const bg=mkBg();const modal=h("div",{class:"modal"});modal.appendChild(mkHead(isEdit?"Edit Angle":"New Angle",()=>bg.remove()));const mb=h("div",{class:"modal-body"});const nr=h("div",{class:"frow"});nr.appendChild(h("label",{class:"flabel"},"Angle Name"));const ni=h("input",{class:"finput",placeholder:"e.g. Confidence angle, Routine swap angle…",value:angle?.name||""});nr.appendChild(ni);mb.appendChild(nr);const cr=h("div",{class:"frow"});cr.appendChild(h("label",{class:"flabel"},"Color"));let selColor=angle?.color||ANGLE_COLORS[0];const cp=h("div",{class:"color-row"});ANGLE_COLORS.forEach(c=>{const dot=css(h("div",{class:"cpick"+(selColor===c?" on":""),onclick:()=>{selColor=c;cp.querySelectorAll(".cpick").forEach(d=>d.classList.remove("on"));dot.classList.add("on");}}),{background:c});cp.appendChild(dot);});cr.appendChild(cp);mb.appendChild(cr);const sr=h("div",{class:"frow"});sr.appendChild(h("label",{class:"flabel"},"Stage"));let selStage=angle?.stage||"Strategy";const sp=h("div",{class:"stage-picker"});STAGES.forEach(s=>{const cfg=sc(s);const btn=h("button",{class:"spick",onclick:()=>{selStage=s;sp.querySelectorAll(".spick").forEach(b=>{b.style.background="";b.style.borderColor="";b.style.color="";});Object.assign(btn.style,{background:cfg.bg,borderColor:cfg.color,color:cfg.color});}},s);if(selStage===s)Object.assign(btn.style,{background:cfg.bg,borderColor:cfg.color,color:cfg.color});sp.appendChild(btn);});sr.appendChild(sp);mb.appendChild(sr);const strat=p.strategy||{};const allAnswers=[];STRATEGY_QS.forEach(q=>{const answers=strat[q.id]||[];answers.forEach((a)=>{if(a?.trim())allAnswers.push({qid:q.id,qLabel:q.label,aText:a.trim()});});});let selBranch=angle?.sourceQuestion?{qid:angle.sourceQuestion,aText:angle.sourceAnswer}:null;if(allAnswers.length){const br=h("div",{class:"frow"});br.appendChild(h("label",{class:"flabel"},"Branch from a Strategy Answer (optional)"));br.appendChild(css(h("div",{},"Which specific answer inspired this angle?"),{fontSize:"11px",color:"var(--subtle)",marginBottom:"8px"}));const bl=h("div",{class:"branch-list"});allAnswers.forEach(item=>{const isOn=()=>selBranch&&selBranch.qid===item.qid&&selBranch.aText===item.aText;const row=h("div",{class:"branch-row"+(isOn()?" on":"")});row.appendChild(h("div",{class:"branch-q"},item.qLabel));row.appendChild(h("div",{class:"branch-a"},`"${item.aText}"`));row.dataset.key=item.qid+"||"+item.aText;row.onclick=()=>{const already=isOn();selBranch=already?null:{qid:item.qid,aText:item.aText};bl.querySelectorAll(".branch-row").forEach(r=>{r.classList.toggle("on",r.dataset.key===item.qid+"||"+item.aText&&!already);});};bl.appendChild(row);});br.appendChild(bl);mb.appendChild(br);}modal.appendChild(mb);const mf=h("div",{class:"modal-foot"});mf.appendChild(h("button",{class:"btn btn-ghost",onclick:()=>bg.remove()},"Cancel"));mf.appendChild(h("button",{class:"btn btn-dark",onclick:()=>{const name=ni.value.trim();if(!name)return;const data={name,color:selColor,stage:selStage,sourceQuestion:selBranch?.qid||null,sourceAnswer:selBranch?.aText||null,brief:angle?.brief||{},tasks:angle?.tasks||[]};if(!DB.products[pid].angles)DB.products[pid].angles={};if(isEdit)Object.assign(DB.products[pid].angles[aid],data);else DB.products[pid].angles[genId()]=data;save();render();bg.remove();}},isEdit?"Save Changes":"Create Angle"));modal.appendChild(mf);bg.appendChild(modal);document.body.appendChild(bg);setTimeout(()=>ni.focus(),50);}
-function openBriefModal(pid,aid,angle){const bg=mkBg();const modal=h("div",{class:"modal"});modal.appendChild(mkHead("Brief — "+angle.name,()=>bg.remove()));const mb=h("div",{class:"modal-body"});const existing=angle.brief||{};const brief={...existing};if(!brief.createdAt)brief.createdAt=Date.now();mb.appendChild(h("div",{class:"brief-date-pill"},"📅 Briefed "+fmtDate(brief.createdAt)));[{key:"objective",label:"Objective",ph:"What's the goal of this content?"},{key:"formats",label:"Content Formats",ph:"UGC, talking head, GRWM, demo, before/after…"},{key:"hooks",label:"Hook Ideas",ph:"Opening lines or visual hooks to test"},{key:"copy",label:"Copy Notes",ph:"Key phrases, proof points, copy direction"}].forEach(f=>{const r=h("div",{class:"frow"});r.appendChild(h("label",{class:"flabel"},f.label));const ta=h("textarea",{class:"finput",placeholder:f.ph});ta.value=brief[f.key]||"";ta.oninput=e=>{brief[f.key]=e.target.value;};r.appendChild(ta);mb.appendChild(r);});modal.appendChild(mb);const mf=h("div",{class:"modal-foot"});mf.appendChild(h("button",{class:"btn btn-ghost",onclick:()=>bg.remove()},"Cancel"));mf.appendChild(h("button",{class:"btn btn-dark",onclick:()=>{DB.products[pid].angles[aid].brief=brief;save();render();bg.remove();}},"Save Brief"));modal.appendChild(mf);bg.appendChild(modal);document.body.appendChild(bg);}
-function openTaskModal(pid,aid,angle,idx){const isEdit=idx!==null;const ex=isEdit?(angle.tasks[idx]||{}):{};const bg=mkBg();const modal=h("div",{class:"modal"});modal.appendChild(mkHead(isEdit?"Edit Task":"Add Task — "+angle.name,()=>bg.remove()));const mb=h("div",{class:"modal-body"});const brief=angle.brief||{};if(brief.objective){const ctx=h("div",{class:"brief-ctx"});ctx.appendChild(h("strong",{},"Brief: "));ctx.appendChild(document.createTextNode(brief.objective));mb.appendChild(ctx);}const vals={title:ex.title||"",assignee:ex.assignee||"",due:ex.due||""};const tr=h("div",{class:"frow"});tr.appendChild(h("label",{class:"flabel"},"Task"));const ti=h("input",{class:"finput",placeholder:"e.g. Film UGC demo, Write hook copy…",value:vals.title});ti.oninput=e=>vals.title=e.target.value;tr.appendChild(ti);mb.appendChild(tr);const ar=h("div",{class:"frow"});ar.appendChild(h("label",{class:"flabel"},"Assigned To"));const ai=h("input",{class:"finput",placeholder:"e.g. Amber",value:vals.assignee});ai.oninput=e=>vals.assignee=e.target.value;ar.appendChild(ai);mb.appendChild(ar);const dr=h("div",{class:"frow"});dr.appendChild(h("label",{class:"flabel"},"Due Date"));const di=h("input",{class:"finput",type:"date",value:vals.due});di.oninput=e=>vals.due=e.target.value;dr.appendChild(di);mb.appendChild(dr);if(isEdit&&ex.assignedAt)mb.appendChild(css(h("div",{},"Assigned: "+fmtDate(ex.assignedAt)),{fontSize:"11px",color:"var(--subtle)",marginTop:"-8px",marginBottom:"12px"}));modal.appendChild(mb);const mf=h("div",{class:"modal-foot"});mf.appendChild(h("button",{class:"btn btn-ghost",onclick:()=>bg.remove()},"Cancel"));mf.appendChild(h("button",{class:"btn btn-dark",onclick:()=>{if(!vals.title.trim())return;const task={id:ex.id||genId(),title:vals.title.trim(),assignee:vals.assignee.trim(),due:vals.due,assignedAt:ex.assignedAt||Date.now(),done:ex.done||false};if(!DB.products[pid].angles[aid].tasks)DB.products[pid].angles[aid].tasks=[];if(isEdit)DB.products[pid].angles[aid].tasks[idx]=task;else DB.products[pid].angles[aid].tasks.push(task);save();render();bg.remove();}},isEdit?"Save Task":"Add Task"));modal.appendChild(mf);bg.appendChild(modal);document.body.appendChild(bg);setTimeout(()=>ti.focus(),50);}
+function buildAnglesSection(id,p){const wrap=h("div");const shdr=h("div",{class:"sec-hdr"});shdr.appendChild(h("span",{class:"sec-desc"},"Each angle branches from a strategy answer and gets its own brief + tasks."));shdr.appendChild(h("button",{class:"btn btn-dark btn-sm",onclick:()=>openAngleModal(id,p,null)},"+ New Angle"));wrap.appendChild(shdr);const angles=Object.entries(p.angles||{});if(!angles.length){wrap.appendChild(buildEmpty("No angles yet","Create your first angle."));return wrap;}const list=h("div",{class:"angles-wrap"});angles.forEach(([aid,angle])=>list.appendChild(buildAngleCard(id,p,aid,angle)));wrap.appendChild(list);return wrap;}
+function buildAngleCard(pid, p, aid, angle) {
+  var isOpen = !!openAngles[aid];
+  var cfg    = sc(angle.stage || "Strategy");
+  var isDone = !!angle.done;
 
+  var card = h("div", {class:"angle-card"});
+  if (isDone) card.style.opacity = "0.65";
 
-/* ════════════════════════════════════════
-   REVIEWS SYSTEM
-════════════════════════════════════════ */
+  // ── Top row (always visible) ──
+  var top = h("div", {class:"angle-card-top", onclick:function(){ openAngles[aid]=!openAngles[aid]; render(); }});
+  top.appendChild(css(h("div",{class:"angle-dot"}),{background:angle.color||"var(--teal)"}));
+  top.appendChild(h("div",{class:"angle-title"},angle.name||"Untitled Angle"));
 
-// Convert any Google Sheets URL → CSV export URL
-function sheetToCsvUrl(url) {
-  var m = url.match(/\/d\/([a-zA-Z0-9-_]+)/);
-  if (!m) return null;
-  var id = m[1];
-  var gidM = url.match(/[#&?]gid=([0-9]+)/);
-  var gid = gidM ? gidM[1] : '0';
-  return 'https://docs.google.com/spreadsheets/d/' + id + '/export?format=csv&gid=' + gid;
-}
+  var meta = h("div",{class:"angle-meta"});
+  meta.appendChild(css(h("span",{class:"stage-pill"},angle.stage||"Strategy"),{background:cfg.bg,color:cfg.color}));
+  if (isDone) meta.appendChild(css(h("span",{},"✓ Done"),{fontSize:"11px",color:"#166534",fontWeight:"700"}));
+  top.appendChild(meta);
 
-// Parse CSV text → array of objects using header row
-function parseCsv(text) {
-  var lines = text.split(/\r?\n/).filter(function(l){ return l.trim(); });
-  if (lines.length < 2) return [];
-  function splitCsvRow(row) {
-    var result = [], cur = '', inQ = false;
-    for (var i = 0; i < row.length; i++) {
-      var ch = row[i];
-      if (ch === '"') {
-        if (inQ && row[i+1] === '"') { cur += '"'; i++; }
-        else inQ = !inQ;
-      } else if (ch === ',' && !inQ) {
-        result.push(cur); cur = '';
-      } else cur += ch;
+  var acts = h("div",{class:"angle-actions"});
+  acts.appendChild(h("button",{class:"icon-btn",onclick:function(e){e.stopPropagation();openAngleModal(pid,p,aid,angle);}},"✎"));
+  acts.appendChild(h("button",{class:"icon-btn del",onclick:function(e){e.stopPropagation();if(confirm("Delete angle?")){delete DB.products[pid].angles[aid];save();render();}}},"✕"));
+  top.appendChild(acts);
+  top.appendChild(css(h("span",{},isOpen?"▲":"▼"),{fontSize:"10px",color:"var(--subtle)",marginLeft:"4px",flexShrink:"0"}));
+  card.appendChild(top);
+
+  // ── Expanded body ──
+  var body = h("div",{class:"angle-body"+(isOpen?" open":"")});
+
+  // Branched from banner
+  if (angle.sourceQuestion || angle.sourceReview) {
+    var banner = h("div",{class:"source-banner"});
+    if (angle.sourceQuestion) {
+      var sq = STRATEGY_QS.find(function(q){return q.id===angle.sourceQuestion;});
+      banner.appendChild(h("strong",{},"Branched from: "));
+      banner.appendChild(document.createTextNode(sq?sq.label:angle.sourceQuestion));
+      if (angle.sourceAnswer) banner.appendChild(h("div",{class:"source-quote"},'"'+angle.sourceAnswer+'"'));
+    } else if (angle.sourceReview) {
+      banner.appendChild(h("strong",{},"Inspired by review: "));
+      banner.appendChild(h("div",{class:"source-quote"},'"'+angle.sourceReview+'"'));
     }
-    result.push(cur);
-    return result;
-  }
-  var headers = splitCsvRow(lines[0]);
-  return lines.slice(1).map(function(line) {
-    var vals = splitCsvRow(line);
-    var obj = {};
-    headers.forEach(function(hdr, i){ obj[hdr.trim()] = (vals[i] || '').trim(); });
-    return obj;
-  }).filter(function(r){ return r['Body'] || r['Title']; });
-}
-// Sync sheet for a product
-async function syncSheet(pid) {
-  var p = DB.products[pid];
-  if (!p.sheetUrl) return;
-
-  // Extract spreadsheet ID
-  var mId = p.sheetUrl.match(/\/d\/([a-zA-Z0-9-_]+)/);
-  if (!mId) { alert('Invalid Google Sheets URL'); return; }
-  var sheetId = mId[1];
-
-  setSyncStatus('saving');
-  try {
-    // Step 1: fetch the sheet metadata to get all tab gids + names
-    var metaUrl = 'https://docs.google.com/spreadsheets/d/' + sheetId + '/edit';
-    // We can't read metadata directly — instead, we fetch each known gid
-    // The user's sheet has named tabs. We fetch the main export (all sheets merged)
-    // by using the gid list stored on the product, or default to scanning gid 0,1,2...
-    // Best approach for multi-tab: fetch each tab by gid sequentially until we get empty
-
-    var allRows = [];
-    var tabNames = p.sheetTabs || []; // [{gid, name}] stored after first sync
-
-    if (tabNames.length === 0) {
-      // First sync: just fetch gid=0 and store — user can add more tabs manually
-      var csvUrl0 = 'https://docs.google.com/spreadsheets/d/' + sheetId + '/export?format=csv&gid=0';
-      var r0 = await fetch(csvUrl0);
-      if (!r0.ok) throw new Error('Could not fetch sheet. Make sure it is shared as "Anyone with link can view".');
-      var t0 = await r0.text();
-      var rows0 = parseCsv(t0);
-      rows0.forEach(function(row){ row._tab = 'Tab 1'; });
-      allRows = allRows.concat(rows0);
-      // Try to auto-detect more tabs (gid 1..5)
-      for (var g = 1; g <= 5; g++) {
-        try {
-          var csvUrlG = 'https://docs.google.com/spreadsheets/d/' + sheetId + '/export?format=csv&gid=' + g;
-          var rG = await fetch(csvUrlG);
-          if (!rG.ok) break;
-          var tG = await rG.text();
-          if (tG.includes('<!DOCTYPE') || tG.includes('<html')) break; // got an error page
-          var rowsG = parseCsv(tG);
-          if (rowsG.length === 0) break;
-          rowsG.forEach(function(row){ row._tab = 'Tab ' + (g+1); });
-          allRows = allRows.concat(rowsG);
-        } catch(e) { break; }
-      }
-    } else {
-      // Subsequent syncs: fetch all stored tabs
-      for (var ti = 0; ti < tabNames.length; ti++) {
-        var tab = tabNames[ti];
-        var csvUrl = 'https://docs.google.com/spreadsheets/d/' + sheetId + '/export?format=csv&gid=' + tab.gid;
-        var resp = await fetch(csvUrl);
-        if (!resp.ok) continue;
-        var text = await resp.text();
-        if (text.includes('<!DOCTYPE') || text.includes('<html')) continue;
-        var rows = parseCsv(text);
-        rows.forEach(function(row){ row._tab = tab.name; });
-        allRows = allRows.concat(rows);
-      }
-    }
-
-    if (!DB.products[pid].reviews) DB.products[pid].reviews = {};
-    // Clear old reviews and replace with fresh data
-    DB.products[pid].reviews = {};
-    allRows.forEach(function(row, i) {
-      var key = (row['Okendo ID'] || ('row_'+i)).replace(/[^a-zA-Z0-9_-]/g,'_');
-      // Avoid key collisions across tabs
-      while (DB.products[pid].reviews[key]) key = key + '_x';
-      DB.products[pid].reviews[key] = {
-        id:        row['Okendo ID'] || '',
-        name:      row['Name'] || 'Anonymous',
-        sentiment: (row['Sentiment'] || 'neutral').toLowerCase(),
-        rating:    parseInt(row['Rating']) || 0,
-        product:   row['Product'] || '',
-        title:     row['Title'] || '',
-        body:      row['Body'] || '',
-        tab:       row['_tab'] || '',
-        synced:    Date.now(),
-      };
-    });
-    p.lastSynced = Date.now();
-    save();
-    setSyncStatus('live');
-    render();
-  } catch(e) {
-    setSyncStatus('live');
-    alert('Sync failed: ' + e.message);
-  }
-}
-
-// Add a tab manually by gid
-async function addSheetTab(pid, gid, name) {
-  var p = DB.products[pid];
-  if (!p.sheetTabs) p.sheetTabs = [];
-  // Remove existing entry with same gid
-  p.sheetTabs = p.sheetTabs.filter(function(t){ return t.gid !== gid; });
-  p.sheetTabs.push({gid: gid, name: name});
-  await syncSheet(pid);
-}
-
-
-// Build the Reviews tab content
-function buildReviewsSection(pid, p) {
-  var wrap = h('div', {});
-
-  // ── Sheet setup ──
-  if (!p.sheetUrl) {
-    var setup = h('div', {class:'sheet-setup'});
-    setup.appendChild(h('div', {class:'sheet-setup-title'}, '🔗 Connect your Google Sheet'));
-    setup.appendChild(h('div', {class:'sheet-setup-sub'},
-      'Paste your Google Sheet URL below. Make sure it is shared as "Anyone with link can view". Columns: Okendo ID, Name, Sentiment, Rating, Product, Title, Body.'
-    ));
-    var row = h('div', {class:'sheet-input-row'});
-    var inp = h('input', {class:'sheet-input', placeholder:'https://docs.google.com/spreadsheets/d/...'});
-    var connectBtn = h('button', {class:'btn btn-dark btn-sm', onclick: async function() {
-      var url = inp.value.trim();
-      if (!url) return;
-      DB.products[pid].sheetUrl = url;
-      save();
-      await syncSheet(pid);
-    }}, 'Connect & Sync');
-    row.appendChild(inp); row.appendChild(connectBtn);
-    setup.appendChild(row);
-    wrap.appendChild(setup);
-    return wrap;
+    body.appendChild(banner);
   }
 
-  // ── Sync bar ──
-  var syncBar = h('div', {class:'sync-bar'});
-  syncBar.appendChild(css(h('span', {}, '🔗'), {fontSize:'14px', flexShrink:'0'}));
-  syncBar.appendChild(h('span', {class:'sync-bar-url'}, p.sheetUrl));
-  var barActs = h('div', {class:'sync-bar-actions'});
-  barActs.appendChild(h('button', {class:'btn btn-dark btn-xs', onclick: async function() {
-    await syncSheet(pid);
-  }}, '↻ Sync Now'));
-  barActs.appendChild(h('button', {class:'btn btn-ghost btn-xs', onclick: function() {
-    if (confirm('Disconnect this sheet?')) {
-      delete DB.products[pid].sheetUrl;
-      delete DB.products[pid].reviews;
-      delete DB.products[pid].sheetTabs;
+  // ── Stage pipeline ──
+  var pipeline = h("div",{class:"pipeline"});
+  var curIdx = STAGES.indexOf(angle.stage||"Strategy");
+  STAGES.forEach(function(s,i){
+    var c2=sc(s); var isAct=i===curIdx, wasDone=i<curIdx;
+    pipeline.appendChild(css(h("button",{class:"pip-btn",onclick:function(e){
+      e.stopPropagation();
+      DB.products[pid].angles[aid].stage=s;
       save(); render();
-    }
-  }}, 'Disconnect'));
-  if (p.lastSynced) barActs.appendChild(css(h('span', {}, 'Synced ' + fmtDate(p.lastSynced)), {fontSize:'10px', color:'var(--subtle)', fontWeight:'500'}));
-  syncBar.appendChild(barActs);
-  wrap.appendChild(syncBar);
-
-  var reviews = Object.values(p.reviews || {});
-  if (!reviews.length) {
-    wrap.appendChild(buildEmpty('No reviews yet', 'Hit Sync Now to pull from your sheet.'));
-    return wrap;
-  }
-
-  // ── Build filter options ──
-  // Collect unique product names from the data
-  var productNames = [];
-  reviews.forEach(function(r) {
-    if (r.product && productNames.indexOf(r.product) === -1) productNames.push(r.product);
+    }},s),{
+      background:isAct?"var(--ink)":wasDone?c2.bg:"var(--cream2)",
+      color:isAct?"var(--gold2)":wasDone?c2.color:"var(--subtle)",
+    }));
   });
-  productNames.sort();
+  body.appendChild(pipeline);
 
-  // Toolbar row 1: product filter
-  var toolbar = h('div', {});
+  // ── Single content area ──
+  var contentGrid = h("div",{});
+  css(contentGrid,{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"12px",marginBottom:"16px"});
 
-  // Product filter pills (if multiple products exist)
-  if (productNames.length > 1) {
-    var prodFilterWrap = h('div', {});
-    css(prodFilterWrap, {display:'flex', alignItems:'center', gap:'8px', marginBottom:'12px', flexWrap:'wrap'});
-    prodFilterWrap.appendChild(css(h('span', {}, 'Product:'), {fontSize:'11px', fontWeight:'700', color:'var(--subtle)', letterSpacing:'.06em', textTransform:'uppercase', flexShrink:'0'}));
-    var prodFilters = h('div', {class:'reviews-filters'});
-    var activeProd = 'All Products';
-
-    function buildProdFilters() {
-      prodFilters.innerHTML = '';
-      ['All Products'].concat(productNames).forEach(function(pname) {
-        var t = h('button', {class:'rfil' + (pname === activeProd ? ' on' : '')}, pname);
-        t.onclick = function() { activeProd = pname; buildProdFilters(); applyFilters(); };
-        prodFilters.appendChild(t);
-      });
-    }
-    prodFilterWrap.appendChild(prodFilters);
-    wrap.appendChild(prodFilterWrap);
-    buildProdFilters();
+  // Created date
+  if (angle.createdAt) {
+    var datePill = h("div",{class:"brief-date-pill"});
+    datePill.textContent = "📅 Created " + fmtDate(angle.createdAt);
+    css(datePill,{gridColumn:"1/-1"});
+    contentGrid.appendChild(datePill);
   }
 
-  // Toolbar row 2: sentiment/rating filters + count
-  var toolbar2 = h('div', {class:'reviews-toolbar'});
-  var countEl = h('span', {class:'reviews-meta'}, reviews.length + ' reviews');
-  toolbar2.appendChild(countEl);
-  var sentFilters = h('div', {class:'reviews-filters'});
-  var activeSent = 'All';
+  // Objective
+  contentGrid.appendChild(buildAngleField(pid, aid, "objective", "Objective", "What's the goal of this content?", false));
+  // Hook Ideas
+  contentGrid.appendChild(buildAngleField(pid, aid, "hooks", "Hook Ideas", "Opening lines or visual hooks to test…", false));
+  // Copy Notes
+  contentGrid.appendChild(buildAngleField(pid, aid, "copy", "Copy Notes", "Key phrases, proof points, copy direction…", false));
+  // Assigned To
+  contentGrid.appendChild(buildAngleField(pid, aid, "assignedTo", "Assigned To", "e.g. Amber", false));
+  // Final Asset Link (full width)
+  var linkField = buildAngleField(pid, aid, "assetLink", "Final Asset Link", "Paste a link to the finished content…", false);
+  css(linkField,{gridColumn:"1/-1"});
+  contentGrid.appendChild(linkField);
 
-  ['All','Positive','Negative','Neutral','5★','1-2★'].forEach(function(f) {
-    var t = h('button', {class:'rfil' + (f === activeSent ? ' on' : '')}, f);
-    t.dataset.sf = f;
-    t.onclick = function() { activeSent = f; sentFilters.querySelectorAll('.rfil').forEach(function(x){ x.classList.remove('on'); }); t.classList.add('on'); applyFilters(); };
-    sentFilters.appendChild(t);
-  });
-  toolbar2.appendChild(sentFilters);
-  wrap.appendChild(toolbar2);
+  body.appendChild(contentGrid);
 
-  var grid = h('div', {class:'reviews-grid'});
-  wrap.appendChild(grid);
+  // ── Done toggle ──
+  var doneRow = h("div",{});
+  css(doneRow,{display:"flex",alignItems:"center",justifyContent:"space-between",paddingTop:"12px",borderTop:"1px solid var(--cream2)"});
+  var doneChk = h("div",{class:"tchk"+(isDone?" done":""),onclick:function(){
+    DB.products[pid].angles[aid].done = !DB.products[pid].angles[aid].done;
+    save(); render();
+  }});
+  if (isDone) doneChk.textContent = "✓";
+  var doneLabel = h("label",{},isDone ? "Marked as complete" : "Mark as complete");
+  css(doneLabel,{fontSize:"12px",color:"var(--muted)",fontWeight:"600",cursor:"pointer",display:"flex",alignItems:"center",gap:"8px"});
+  doneLabel.prepend(doneChk);
+  doneRow.appendChild(doneLabel);
 
-  var activeProd2 = typeof activeProd !== 'undefined' ? null : null; // reference via closure
-
-  function applyFilters() {
-    // Read current active product filter
-    var selProd = 'All Products';
-    var prodBtns = wrap.querySelectorAll('.reviews-filters .rfil');
-    // Find the product filter row separately — use data attribute
-    var allRfil = wrap.querySelectorAll('[data-pf]');
-    allRfil.forEach(function(b){ if(b.classList.contains('on')) selProd = b.dataset.pf; });
-
-    grid.innerHTML = '';
-    var filtered = reviews.filter(function(r) {
-      var prodMatch = selProd === 'All Products' || r.product === selProd;
-      var sentMatch = true;
-      if (activeSent === 'Positive') sentMatch = r.sentiment === 'positive';
-      else if (activeSent === 'Negative') sentMatch = r.sentiment === 'negative';
-      else if (activeSent === 'Neutral') sentMatch = r.sentiment === 'neutral';
-      else if (activeSent === '5★') sentMatch = r.rating === 5;
-      else if (activeSent === '1-2★') sentMatch = r.rating <= 2 && r.rating > 0;
-      return prodMatch && sentMatch;
-    });
-    countEl.textContent = filtered.length + ' of ' + reviews.length + ' reviews';
-    if (!filtered.length) {
-      grid.appendChild(buildEmpty('No reviews match', 'Try a different filter.'));
-    } else {
-      filtered.forEach(function(r){ grid.appendChild(buildReviewCard(pid, p, r)); });
-    }
+  // Show asset link as clickable if filled
+  if (angle.assetLink) {
+    var linkBtn = h("a",{href:angle.assetLink,target:"_blank",class:"btn btn-ghost btn-xs"},"🔗 View Asset");
+    doneRow.appendChild(linkBtn);
   }
+  body.appendChild(doneRow);
 
-  // Rebuild product filter with data-pf attributes for applyFilters to read
-  if (productNames.length > 1) {
-    var pfRow = wrap.querySelector('.reviews-filters');
-    if (pfRow) {
-      pfRow.querySelectorAll('.rfil').forEach(function(btn, i) {
-        btn.dataset.pf = i === 0 ? 'All Products' : productNames[i-1];
-        btn.onclick = function() {
-          pfRow.querySelectorAll('.rfil').forEach(function(x){ x.classList.remove('on'); });
-          btn.classList.add('on');
-          applyFilters();
-        };
-      });
-    }
-  }
+  card.appendChild(body);
+  return card;
+}
 
-  applyFilters();
+// Inline editable field for angle content
+function buildAngleField(pid, aid, fieldKey, label, placeholder, fullWidth) {
+  var wrap = h("div",{class:"brief-field"});
+  wrap.appendChild(h("div",{class:"brief-lbl"},label));
+  var angle = DB.products[pid].angles[aid];
+  var content = angle[fieldKey] || "";
+  var ta = h("textarea",{class:"answer-txt",placeholder:placeholder});
+  ta.value = content;
+  ta.style.minHeight = "52px";
+  ta.style.width = "100%";
+  ta.style.marginTop = "4px";
+  ta.oninput = function(e){
+    DB.products[pid].angles[aid][fieldKey] = e.target.value;
+    save();
+  };
+  wrap.appendChild(ta);
   return wrap;
 }
 
 
-function buildReviewCard(pid, p, r) {
-  const card = h('div', {class:'review-card'});
-  card.dataset.reviewId = r.id;
-
-  // Top row
-  const top = h('div', {class:'review-card-top'});
-  const left = h('div', {class:'review-left'});
-  const initials = (r.name||'?').split(' ').map(w=>w[0]||'').join('').slice(0,2).toUpperCase();
-  left.appendChild(h('div', {class:'review-avatar'}, initials));
-  const nameWrap = h('div', {});
-  nameWrap.appendChild(h('div', {class:'review-name'}, r.name || 'Anonymous'));
-  if (r.product) nameWrap.appendChild(h('div', {class:'review-product'}, r.product));
-  left.appendChild(nameWrap);
-  top.appendChild(left);
-
-  const right = h('div', {class:'review-right'});
-  // Stars
-  if (r.rating) {
-    const stars = h('div', {class:'stars'});
-    for (let i=1; i<=5; i++) stars.appendChild(h('span', {class:'star'+(i>r.rating?' empty':'')}, '★'));
-    right.appendChild(stars);
-  }
-  const sentCls = {positive:'sent-positive', negative:'sent-negative', neutral:'sent-neutral'}[r.sentiment] || 'sent-neutral';
-  right.appendChild(h('span', {class:'sentiment-badge '+sentCls}, r.sentiment || 'neutral'));
-  top.appendChild(right);
-  card.appendChild(top);
-
-  // Title + body
-  if (r.title) card.appendChild(h('div', {class:'review-title'}, r.title));
-  const bodyEl = h('div', {class:'review-body'}, r.body || '');
-  card.appendChild(bodyEl);
-  if ((r.body||'').length > 200) {
-    let expanded = false;
-    const expBtn = h('button', {class:'review-expand', onclick:() => {
-      expanded = !expanded;
-      bodyEl.classList.toggle('expanded', expanded);
-      expBtn.textContent = expanded ? 'Show less' : 'Read more';
-    }}, 'Read more');
-    card.appendChild(expBtn);
-  }
-
-  // Footer
-  const footer = h('div', {class:'review-footer'});
-  footer.appendChild(h('span', {class:'review-date'}, r.id ? 'ID: '+r.id.slice(0,12)+'…' : ''));
-
-  // Generate angles button
-  const genWrap = h('div', {});
-  const genBtn = h('button', {class:'btn btn-dark btn-xs', onclick: () => generateAnglesFromReview(pid, p, r, card, genBtn)},
-    '+ Create Angle'
-  );
-  genWrap.appendChild(genBtn);
-  footer.appendChild(genWrap);
-  card.appendChild(footer);
-
-  return card;
-}
-
-// Open a modal to create an angle inspired by a specific review
-function generateAnglesFromReview(pid, p, review, card, btn) {
-  var bg = mkBg();
-  var modal = h('div', {class:'modal'});
-  modal.appendChild(mkHead('Create Angle from Review', function(){ bg.remove(); }));
-
-  var mb = h('div', {class:'modal-body'});
-
-  // Show the review as context at the top
-  var reviewCtx = h('div', {});
-  css(reviewCtx, {background:'var(--cream2)', borderRadius:'10px', padding:'12px 14px', marginBottom:'18px', fontSize:'12px', color:'#374151', lineHeight:'1.7'});
-  if (review.title) reviewCtx.appendChild(css(h('div', {}, '"' + review.title + '"'), {fontWeight:'700', marginBottom:'4px', color:'var(--ink)'}));
-  reviewCtx.appendChild(h('div', {}, review.body || ''));
-  var reviewMeta = h('div', {});
-  css(reviewMeta, {marginTop:'8px', fontSize:'11px', color:'var(--muted)', display:'flex', gap:'10px'});
-  reviewMeta.appendChild(h('span', {}, '— ' + (review.name || 'Anonymous')));
-  if (review.rating) reviewMeta.appendChild(h('span', {}, '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating)));
-  reviewCtx.appendChild(reviewMeta);
-  mb.appendChild(reviewCtx);
-
-  // Angle name
-  var nr = h('div', {class:'frow'});
-  nr.appendChild(h('label', {class:'flabel'}, 'Angle Name / Hook'));
-  var ni = h('input', {class:'finput', placeholder:'e.g. SPF that actually works for lazy girls'});
-  nr.appendChild(ni); mb.appendChild(nr);
-
-  // Notes
-  var wr = h('div', {class:'frow'});
-  wr.appendChild(h('label', {class:'flabel'}, 'Why this angle works (optional)'));
-  var wi = h('textarea', {class:'finput', placeholder:'What makes this review insight powerful for an ad…'});
-  wi.style.minHeight = '70px';
-  wr.appendChild(wi); mb.appendChild(wr);
-
-  // Color picker
-  var cr = h('div', {class:'frow'}); cr.appendChild(h('label', {class:'flabel'}, 'Color'));
-  var selColor = ANGLE_COLORS[Math.floor(Math.random() * ANGLE_COLORS.length)];
-  var cp = h('div', {class:'color-row'});
-  ANGLE_COLORS.forEach(function(c) {
-    var dot = css(h('div', {class:'cpick' + (selColor===c?' on':''), onclick: function(){
-      selColor = c;
-      cp.querySelectorAll('.cpick').forEach(function(d){ d.classList.remove('on'); });
-      dot.classList.add('on');
-    }}), {background:c});
-    cp.appendChild(dot);
-  });
-  cr.appendChild(cp); mb.appendChild(cr);
-
-  // Stage picker
-  var sr = h('div', {class:'frow'}); sr.appendChild(h('label', {class:'flabel'}, 'Stage'));
-  var selStage = 'Strategy';
-  var sp = h('div', {class:'stage-picker'});
-  STAGES.forEach(function(s) {
-    var cfg = sc(s);
-    var sbtn = h('button', {class:'spick', onclick: function(){
-      selStage = s;
-      sp.querySelectorAll('.spick').forEach(function(b){ b.style.background=''; b.style.borderColor=''; b.style.color=''; });
-      Object.assign(sbtn.style, {background:cfg.bg, borderColor:cfg.color, color:cfg.color});
-    }}, s);
-    if (s === selStage) Object.assign(sbtn.style, {background:cfg.bg, borderColor:cfg.color, color:cfg.color});
-    sp.appendChild(sbtn);
-  });
-  sr.appendChild(sp); mb.appendChild(sr);
-
-  modal.appendChild(mb);
-  var mf = h('div', {class:'modal-foot'});
-  mf.appendChild(h('button', {class:'btn btn-ghost', onclick: function(){ bg.remove(); }}, 'Cancel'));
-  mf.appendChild(h('button', {class:'btn btn-dark', onclick: function(){
-    var name = ni.value.trim();
-    if (!name) return;
-    if (!DB.products[pid].angles) DB.products[pid].angles = {};
-    var nid = genId();
-    DB.products[pid].angles[nid] = {
-      name: name,
-      color: selColor,
-      stage: selStage,
-      sourceQuestion: null,
-      sourceAnswer: null,
-      sourceReview: (review.name || '') + ': "' + (review.body || '').slice(0, 120) + (review.body && review.body.length > 120 ? '…' : '') + '"',
-      brief: {
-        objective: wi.value.trim() || ('Inspired by review: "' + (review.title || review.body.slice(0,60)) + '"'),
-        hooks: name
-      },
-      tasks: []
-    };
-    save();
-    bg.remove();
-    // Show confirmation on the button
-    btn.textContent = '✓ Angle Saved';
-    btn.disabled = true;
-    css(btn, {background:'#dcfce7', color:'#166534'});
-    setTimeout(function(){ btn.textContent = '+ Create Angle'; btn.disabled = false; css(btn, {background:'', color:''}); }, 3000);
-  }}, 'Save to Angles'));
-  modal.appendChild(mf);
-  bg.appendChild(modal);
-  document.body.appendChild(bg);
-  setTimeout(function(){ ni.focus(); }, 50);
-}
-
+function buildEmpty(title,sub){const el=h("div",{class:"empty"});el.appendChild(h("div",{class:"empty-icon"},"✦"));el.appendChild(h("div",{class:"empty-txt"},title));el.appendChild(h("div",{class:"empty-sub"},sub));return el;}
+function mkBg(){const bg=h("div",{class:"modal-bg"});bg.onclick=e=>{if(e.target===bg)bg.remove();};return bg;}
+function mkHead(title,onClose){const mh=h("div",{class:"modal-head"});mh.appendChild(h("div",{class:"modal-title"},title));mh.appendChild(h("button",{class:"modal-close",onclick:onClose},"×"));return mh;}
+function openProductModal(id=null,p=null){const isEdit=!!id;const bg=mkBg();const modal=h("div",{class:"modal"});modal.appendChild(mkHead(isEdit?"Edit Product":"New Product",()=>bg.remove()));const mb=h("div",{class:"modal-body"});const nr=h("div",{class:"frow"});nr.appendChild(h("label",{class:"flabel"},"Product / Bundle Name"));const ni=h("input",{class:"finput",placeholder:"e.g. Sun Veil Illuminating Elixir SPF 38",value:p?.name||""});nr.appendChild(ni);mb.appendChild(nr);const cr=h("div",{class:"frow"});cr.appendChild(h("label",{class:"flabel"},"Category"));const cs=h("select",{class:"finput"});CATEGORIES.forEach(c=>{const o=h("option",{value:c},c);if(p?.category===c)o.selected=true;cs.appendChild(o);});cr.appendChild(cs);mb.appendChild(cr);modal.appendChild(mb);const mf=h("div",{class:"modal-foot"});mf.appendChild(h("button",{class:"btn btn-ghost",onclick:()=>bg.remove()},"Cancel"));mf.appendChild(h("button",{class:"btn btn-dark",onclick:()=>{const name=ni.value.trim();if(!name)return;if(isEdit){DB.products[id].name=name;DB.products[id].category=cs.value;}else{const nid=genId();DB.products[nid]={name,category:cs.value,strategy:{},angles:{}};}save();render();bg.remove();}},"Create Product" ));modal.appendChild(mf);bg.appendChild(modal);document.body.appendChild(bg);setTimeout(()=>ni.focus(),50);}
+function openAngleModal(pid,p,aid=null,angle=null){const isEdit=!!aid;const bg=mkBg();const modal=h("div",{class:"modal"});modal.appendChild(mkHead(isEdit?"Edit Angle":"New Angle",()=>bg.remove()));const mb=h("div",{class:"modal-body"});const nr=h("div",{class:"frow"});nr.appendChild(h("label",{class:"flabel"},"Angle Name"));const ni=h("input",{class:"finput",placeholder:"e.g. Confidence angle, Routine swap angle…",value:angle?.name||""});nr.appendChild(ni);mb.appendChild(nr);const cr=h("div",{class:"frow"});cr.appendChild(h("label",{class:"flabel"},"Color"));let selColor=angle?.color||ANGLE_COLORS[0];const cp=h("div",{class:"color-row"});ANGLE_COLORS.forEach(c=>{const dot=css(h("div",{class:"cpick"+(selColor===c?" on":""),onclick:()=>{selColor=c;cp.querySelectorAll(".cpick").forEach(d=>d.classList.remove("on"));dot.classList.add("on");}}),{background:c});cp.appendChild(dot);});cr.appendChild(cp);mb.appendChild(cr);const sr=h("div",{class:"frow"});sr.appendChild(h("label",{class:"flabel"},"Stage"));let selStage=angle?.stage||"Strategy";const sp=h("div",{class:"stage-picker"});STAGES.forEach(s=>{const cfg=sc(s);const btn=h("button",{class:"spick",onclick:()=>{selStage=s;sp.querySelectorAll(".spick").forEach(b=>{b.style.background="";b.style.borderColor="";b.style.color="";});Object.assign(btn.style,{background:cfg.bg,borderColor:cfg.color,color:cfg.color});}},s);if(selStage===s)Object.assign(btn.style,{background:cfg.bg,borderColor:cfg.color,color:cfg.color});sp.appendChild(btn);});sr.appendChild(sp);mb.appendChild(sr);const strat=p.strategy||{};const allAnswers=[];STRATEGY_QS.forEach(q=>{const answers=strat[q.id]||[];answers.forEach((a)=>{if(a?.trim())allAnswers.push({qid:q.id,qLabel:q.label,aText:a.trim()});});});let selBranch=angle?.sourceQuestion?{qid:angle.sourceQuestion,aText:angle.sourceAnswer}:null;if(allAnswers.length){const br=h("div",{class:"frow"});br.appendChild(h("label",{class:"flabel"},"Branch from a Strategy Answer (optional)"));br.appendChild(css(h("div",{},"Which specific answer inspired this angle?"),{fontSize:"11px",color:"var(--subtle)",marginBottom:"8px"}));const bl=h("div",{class:"branch-list"});allAnswers.forEach(item=>{const isOn=()=>selBranch&&selBranch.qid===item.qid&&selBranch.aText===item.aText;const row=h("div",{class:"branch-row"+(isOn()?" on":"")});row.appendChild(h("div",{class:"branch-q"},item.qLabel));row.appendChild(h("div",{class:"branch-a"},`"${item.aText}"`));row.dataset.key=item.qid+"||"+item.aText;row.onclick=()=>{const already=isOn();selBranch=already?null:{qid:item.qid,aText:item.aText};bl.querySelectorAll(".branch-row").forEach(r=>{r.classList.toggle("on",r.dataset.key===item.qid+"||"+item.aText&&!already);});};bl.appendChild(row);});br.appendChild(bl);mb.appendChild(br);}modal.appendChild(mb);const mf=h("div",{class:"modal-foot"});mf.appendChild(h("button",{class:"btn btn-ghost",onclick:()=>bg.remove()},"Cancel"));mf.appendChild(h("button",{class:"btn btn-dark",onclick:()=>{const name=ni.value.trim();if(!name)return;const data={name,color:selColor,stage:selStage,sourceQuestion:selBranch?.qid||null,sourceAnswer:selBranch?.aText||null,brief:angle?.brief||{},tasks:angle?.tasks||[]};if(!DB.products[pid].angles)DB.products[pid].angles={};if(isEdit)Object.assign(DB.products[pid].angles[aid],data);else{var naid=genId();data.createdAt=Date.now();DB.products[pid].angles[naid]=data;}save();render();bg.remove();}},isEdit?"Save Changes":"Create Angle"));modal.appendChild(mf);bg.appendChild(modal);document.body.appendChild(bg);setTimeout(()=>ni.focus(),50);}
 if(window.__fbReady)initFB();
 else document.addEventListener("fb-ready",initFB);
 </script>
