@@ -185,6 +185,63 @@ textarea.finput{resize:vertical;min-height:80px;line-height:1.6}
 .empty-sub{font-size:12px}
 .sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:12px}
 .sec-desc{font-size:12px;color:var(--subtle)}
+
+/* ─── REVIEWS TAB ─────────────────────────── */
+.sheet-setup{background:var(--surface);border:1.5px dashed var(--border);border-radius:var(--r-lg);padding:28px;text-align:center;margin-bottom:24px}
+.sheet-setup-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--ink);margin-bottom:6px}
+.sheet-setup-sub{font-size:12px;color:var(--muted);margin-bottom:18px;line-height:1.6;max-width:480px;margin-left:auto;margin-right:auto}
+.sheet-input-row{display:flex;gap:8px;max-width:560px;margin:0 auto}
+.sheet-input{flex:1;padding:10px 14px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:12px;color:var(--ink);outline:none;background:#FAFAF8;transition:border-color .15s}
+.sheet-input:focus{border-color:var(--gold)}
+
+.reviews-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+.reviews-meta{font-size:12px;color:var(--muted)}
+.reviews-filters{display:flex;gap:6px;flex-wrap:wrap}
+.rfil{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;border:1.5px solid var(--border);background:var(--surface);color:var(--muted);cursor:pointer;transition:all .15s}
+.rfil:hover{background:var(--cream2)}
+.rfil.on{background:var(--ink);color:var(--gold2);border-color:var(--ink)}
+
+.reviews-grid{display:flex;flex-direction:column;gap:10px}
+.review-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:18px 20px;transition:all .2s;box-shadow:var(--shadow-sm)}
+.review-card:hover{border-color:var(--gold);box-shadow:var(--shadow-md)}
+.review-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}
+.review-left{display:flex;align-items:center;gap:10px}
+.review-avatar{width:34px;height:34px;border-radius:50%;background:var(--cream2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--navy);flex-shrink:0;border:1.5px solid var(--border)}
+.review-name{font-weight:700;font-size:13px;color:var(--ink)}
+.review-product{font-size:11px;color:var(--muted);margin-top:1px}
+.review-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.stars{display:flex;gap:2px}
+.star{font-size:12px;color:#D4AF6A}
+.star.empty{color:var(--border)}
+.sentiment-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;letter-spacing:.04em;text-transform:uppercase}
+.sent-positive{background:#dcfce7;color:#166534}
+.sent-negative{background:#fee2e2;color:#9f1239}
+.sent-neutral{background:#fef9c3;color:#854d0e}
+.review-title{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:5px}
+.review-body{font-size:12px;color:#374151;line-height:1.7;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.review-body.expanded{-webkit-line-clamp:unset;overflow:visible}
+.review-expand{font-size:11px;font-weight:600;color:var(--gold);background:none;border:none;cursor:pointer;padding:4px 0;margin-top:4px;letter-spacing:.02em}
+.review-footer{display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding-top:12px;border-top:1px solid var(--cream2)}
+.review-date{font-size:10px;color:var(--subtle)}
+
+/* generated angles from review */
+.gen-angles-wrap{margin-top:14px;padding-top:14px;border-top:1px solid var(--cream2)}
+.gen-angles-title{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--subtle);margin-bottom:10px}
+.gen-angle-item{background:var(--cream);border:1px solid var(--border);border-radius:var(--r-md);padding:12px 14px;margin-bottom:8px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.gen-angle-text{flex:1}
+.gen-angle-hook{font-size:12px;font-weight:700;color:var(--ink);margin-bottom:3px}
+.gen-angle-why{font-size:11px;color:var(--muted);line-height:1.55}
+.gen-angle-save{flex-shrink:0}
+
+/* loading spinner for AI */
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:middle;margin-right:6px}
+.generating-msg{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:8px;padding:12px 0}
+
+.sync-bar{display:flex;align-items:center;gap:10px;background:var(--cream2);border-radius:var(--r-md);padding:10px 16px;margin-bottom:20px}
+.sync-bar-url{flex:1;font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sync-bar-actions{display:flex;gap:6px;flex-shrink:0}
+
 </style>
 </head>
 <body>
@@ -242,7 +299,8 @@ function render(){const page=document.getElementById("mainPage");const sy=window
 function buildBC(items){const bc=h("div",{class:"breadcrumb"});items.forEach((item,i)=>{const el=h("span",{class:"bc-item"+(i===items.length-1?" active":"")},item.label);if(item.go)el.onclick=item.go;bc.appendChild(el);if(i<items.length-1)bc.appendChild(h("span",{class:"bc-sep"},"›"));});return bc;}
 function buildOverview(){const frag=document.createDocumentFragment();const prods=Object.entries(DB.products);const hdr=h("div",{class:"page-hdr"});const hL=h("div");hL.appendChild(h("div",{class:"page-title"},"Creative Strategy"));hL.appendChild(h("div",{class:"page-sub"},"Products  ›  Strategy  ›  Angles  ›  Brief + Tasks"));hdr.appendChild(hL);hdr.appendChild(h("button",{class:"btn btn-dark",onclick:()=>openProductModal()},"+ New Product"));frag.appendChild(hdr);const strip=h("div",{class:"stat-strip"});const totalA=prods.reduce((n,[,p])=>n+Object.keys(p.angles||{}).length,0);const liveA=prods.reduce((n,[,p])=>n+Object.values(p.angles||{}).filter(a=>a.stage==="Live").length,0);const inProd=prods.reduce((n,[,p])=>n+Object.values(p.angles||{}).filter(a=>a.stage==="In Production").length,0);const allT=prods.reduce((arr,[,p])=>arr.concat(...Object.values(p.angles||{}).map(a=>a.tasks||[])),[]);const doneT=allT.filter(t=>t.done).length;[["Products",prods.length,""],["Angles",totalA,""],["In Production",inProd,"accent"],["Live",liveA,""],["Tasks Done",`${doneT}/${allT.length}`,""]].forEach(([label,n,cls])=>{const c=h("div",{class:"stat-card"+(cls?" "+cls:"")});c.appendChild(h("div",{class:"stat-n"},String(n)));c.appendChild(h("div",{class:"stat-l"},label));strip.appendChild(c);});frag.appendChild(strip);const bar=h("div",{class:"filter-bar"});const grid=h("div",{class:"prod-grid"});function applyFilter(f){bar.querySelectorAll(".ftab").forEach(t=>t.classList.remove("on"));bar.querySelector(`[data-f="${f}"]`).classList.add("on");grid.innerHTML="";let filtered=prods;if(f!=="All")filtered=prods.filter(([,p])=>Object.values(p.angles||{}).some(a=>a.stage===f));if(!filtered.length){grid.appendChild(buildEmpty("No products yet","Use the button above to add your first product."));}else filtered.forEach(([id,p])=>grid.appendChild(buildPcard(id,p)));}["All",...STAGES].forEach(f=>{const t=h("button",{class:"ftab"},f);t.dataset.f=f;t.onclick=()=>applyFilter(f);bar.appendChild(t);});frag.appendChild(bar);applyFilter("All");frag.appendChild(grid);return frag;}
 function buildPcard(id,p){const angles=Object.entries(p.angles||{});const card=h("div",{class:"pcard",onclick:()=>{VIEW={type:"product",id};detailTab="strategy";render();}});card.appendChild(h("div",{class:"pcard-stripe"}));const body=h("div",{class:"pcard-body"});const top=h("div",{class:"pcard-top"});top.appendChild(h("div",{class:"pcard-name"},p.name||"Untitled"));if(p.category)top.appendChild(h("div",{class:"pcard-cat"},p.category));body.appendChild(top);const preview=(p.strategy?.unique||[])[0]||(p.strategy?.one_thing||[])[0]||"";body.appendChild(css(h("div",{class:"pcard-preview"},preview||"No strategy notes yet"),{color:preview?"":"var(--subtle)",fontStyle:preview?"":"italic"}));if(angles.length){const chips=h("div",{class:"angle-chips"});angles.slice(0,4).forEach(([,a])=>chips.appendChild(css(h("div",{class:"angle-chip"},a.name||"Angle"),{borderColor:a.color||"var(--border)",color:a.color||"var(--muted)",background:a.color?(a.color+"18"):"var(--cream2)"})));if(angles.length>4)chips.appendChild(css(h("div",{class:"angle-chip"},`+${angles.length-4} more`),{borderColor:"var(--border)",color:"var(--muted)"}));body.appendChild(chips);}const footer=h("div",{class:"pcard-footer"});const allT=angles.reduce((arr,[,a])=>arr.concat(a.tasks||[]),[]);const doneT=allT.filter(t=>t.done).length;footer.appendChild(h("span",{class:"task-summary"},allT.length?`✓ ${doneT}/${allT.length} tasks`:"No tasks"));const acts=h("div",{class:"pcard-acts"});acts.appendChild(h("button",{class:"btn btn-ghost btn-xs",onclick:e=>{e.stopPropagation();openProductModal(id,p);}},"Edit"));acts.appendChild(h("button",{class:"btn btn-danger btn-xs",onclick:e=>{e.stopPropagation();if(confirm("Delete "+p.name+"?")){delete DB.products[id];save();render();}}},"✕"));footer.appendChild(acts);body.appendChild(footer);card.appendChild(body);return card;}
-function buildDetail(id,p){const frag=document.createDocumentFragment();frag.appendChild(buildBC([{label:"All Products",go:()=>{VIEW={type:"overview"};render();}},{label:p.name||"Untitled"}]));const hdr=h("div",{class:"detail-hdr"});const hL=h("div",{style:"flex:1"});hL.appendChild(h("div",{class:"detail-name"},p.name||"Untitled"));const angles=Object.values(p.angles||{});hL.appendChild(h("div",{class:"detail-meta"},(p.category?p.category+" · ":"")+angles.length+" angle"+(angles.length===1?"":"s")+" · "+angles.filter(a=>a.stage==="Live").length+" live"));hdr.appendChild(hL);hdr.appendChild(h("div",{class:"hdr-actions"},h("button",{class:"btn btn-ghost btn-sm",onclick:()=>openProductModal(id,p)},"Edit"),h("button",{class:"btn btn-dark btn-sm",onclick:()=>openAngleModal(id,p,null)},"+ New Angle")));frag.appendChild(hdr);const itabs=h("div",{class:"itabs"});const tabs=[{id:"strategy",label:"Strategy Foundation"},{id:"angles",label:"Angles"+(angles.length?" ("+angles.length+")":"")}];const content=h("div");function showTab(tid){detailTab=tid;itabs.querySelectorAll(".itab").forEach((t,i)=>t.classList.toggle("on",tabs[i].id===tid));content.innerHTML="";if(tid==="strategy")content.appendChild(buildStrategySection(id,p));if(tid==="angles")content.appendChild(buildAnglesSection(id,p));}tabs.forEach(t=>itabs.appendChild(h("button",{class:"itab"+(t.id===detailTab?" on":""),onclick:()=>showTab(t.id)},t.label)));frag.appendChild(itabs);showTab(detailTab);frag.appendChild(content);return frag;}
+function buildDetail(id,p){const frag=document.createDocumentFragment();frag.appendChild(buildBC([{label:"All Products",go:()=>{VIEW={type:"overview"};render();}},{label:p.name||"Untitled"}]));const hdr=h("div",{class:"detail-hdr"});const hL=h("div",{style:"flex:1"});hL.appendChild(h("div",{class:"detail-name"},p.name||"Untitled"));const angles=Object.values(p.angles||{});hL.appendChild(h("div",{class:"detail-meta"},(p.category?p.category+" · ":"")+angles.length+" angle"+(angles.length===1?"":"s")+" · "+angles.filter(a=>a.stage==="Live").length+" live"));hdr.appendChild(hL);hdr.appendChild(h("div",{class:"hdr-actions"},h("button",{class:"btn btn-ghost btn-sm",onclick:()=>openProductModal(id,p)},"Edit"),h("button",{class:"btn btn-dark btn-sm",onclick:()=>openAngleModal(id,p,null)},"+ New Angle")));frag.appendChild(hdr);const itabs=h("div",{class:"itabs"});const reviews=Object.values(p.reviews||{});
+  const tabs=[{id:"strategy",label:"Strategy Foundation"},{id:"angles",label:"Angles"+(angles.length?" ("+angles.length+")":"")},{id:"reviews",label:"Reviews"+(reviews.length?" ("+reviews.length+")":"")}];const content=h("div");function showTab(tid){detailTab=tid;itabs.querySelectorAll(".itab").forEach((t,i)=>t.classList.toggle("on",tabs[i].id===tid));content.innerHTML="";if(tid==="strategy")content.appendChild(buildStrategySection(id,p));if(tid==="angles")content.appendChild(buildAnglesSection(id,p));if(tid==="reviews")content.appendChild(buildReviewsSection(id,p));}tabs.forEach(t=>itabs.appendChild(h("button",{class:"itab"+(t.id===detailTab?" on":""),onclick:()=>showTab(t.id)},t.label)));frag.appendChild(itabs);showTab(detailTab);frag.appendChild(content);return frag;}
 function buildStrategySection(id,p){const wrap=h("div");wrap.appendChild(h("p",{class:"strat-intro"},"Answer each question — add as many answers as you like. Each answer can become its own angle."));const grid=h("div",{class:"strat-grid"});STRATEGY_QS.forEach(q=>grid.appendChild(buildSqCard(id,p,q)));wrap.appendChild(grid);return wrap;}
 function buildSqCard(pid,p,q){const card=h("div",{class:"sq-card"});const sqH=h("div",{class:"sq-header"});sqH.appendChild(h("div",{class:"sq-q"},q.label));sqH.appendChild(h("span",{class:"sq-tag "+TAG_CLS[q.tag]},q.tagLabel));card.appendChild(sqH);const answersDiv=h("div",{class:"sq-answers"});function renderAnswers(){answersDiv.innerHTML="";const vals=DB.products[pid].strategy?.[q.id]||[""];vals.forEach((val,i)=>{const row=h("div",{class:"answer-row"});const ta=h("textarea",{class:"answer-txt",placeholder:"Your answer…"});ta.value=val;ta.rows=2;ta.oninput=e=>{if(!DB.products[pid].strategy)DB.products[pid].strategy={};if(!DB.products[pid].strategy[q.id])DB.products[pid].strategy[q.id]=[];DB.products[pid].strategy[q.id][i]=e.target.value;save();};row.appendChild(ta);if(vals.length>1){const del=h("button",{class:"answer-del",title:"Remove",onclick:()=>{DB.products[pid].strategy[q.id].splice(i,1);save();renderAnswers();}},"×");row.appendChild(del);}answersDiv.appendChild(row);});const add=h("button",{class:"add-answer-btn",onclick:()=>{if(!DB.products[pid].strategy)DB.products[pid].strategy={};if(!DB.products[pid].strategy[q.id])DB.products[pid].strategy[q.id]=[];DB.products[pid].strategy[q.id].push("");save();renderAnswers();}},"+ Add another answer");answersDiv.appendChild(add);}renderAnswers();card.appendChild(answersDiv);return card;}
 function buildAnglesSection(id,p){const wrap=h("div");const shdr=h("div",{class:"sec-hdr"});shdr.appendChild(h("span",{class:"sec-desc"},"Each angle branches from a strategy answer and gets its own brief + tasks."));shdr.appendChild(h("button",{class:"btn btn-dark btn-sm",onclick:()=>openAngleModal(id,p,null)},"+ New Angle"));wrap.appendChild(shdr);const angles=Object.entries(p.angles||{});if(!angles.length){wrap.appendChild(buildEmpty("No angles yet","Create an angle to start building briefs and tasks."));return wrap;}const list=h("div",{class:"angles-wrap"});angles.forEach(([aid,angle])=>list.appendChild(buildAngleCard(id,p,aid,angle)));wrap.appendChild(list);return wrap;}
@@ -256,6 +314,332 @@ function openProductModal(id=null,p=null){const isEdit=!!id;const bg=mkBg();cons
 function openAngleModal(pid,p,aid=null,angle=null){const isEdit=!!aid;const bg=mkBg();const modal=h("div",{class:"modal"});modal.appendChild(mkHead(isEdit?"Edit Angle":"New Angle",()=>bg.remove()));const mb=h("div",{class:"modal-body"});const nr=h("div",{class:"frow"});nr.appendChild(h("label",{class:"flabel"},"Angle Name"));const ni=h("input",{class:"finput",placeholder:"e.g. Confidence angle, Routine swap angle…",value:angle?.name||""});nr.appendChild(ni);mb.appendChild(nr);const cr=h("div",{class:"frow"});cr.appendChild(h("label",{class:"flabel"},"Color"));let selColor=angle?.color||ANGLE_COLORS[0];const cp=h("div",{class:"color-row"});ANGLE_COLORS.forEach(c=>{const dot=css(h("div",{class:"cpick"+(selColor===c?" on":""),onclick:()=>{selColor=c;cp.querySelectorAll(".cpick").forEach(d=>d.classList.remove("on"));dot.classList.add("on");}}),{background:c});cp.appendChild(dot);});cr.appendChild(cp);mb.appendChild(cr);const sr=h("div",{class:"frow"});sr.appendChild(h("label",{class:"flabel"},"Stage"));let selStage=angle?.stage||"Strategy";const sp=h("div",{class:"stage-picker"});STAGES.forEach(s=>{const cfg=sc(s);const btn=h("button",{class:"spick",onclick:()=>{selStage=s;sp.querySelectorAll(".spick").forEach(b=>{b.style.background="";b.style.borderColor="";b.style.color="";});Object.assign(btn.style,{background:cfg.bg,borderColor:cfg.color,color:cfg.color});}},s);if(selStage===s)Object.assign(btn.style,{background:cfg.bg,borderColor:cfg.color,color:cfg.color});sp.appendChild(btn);});sr.appendChild(sp);mb.appendChild(sr);const strat=p.strategy||{};const allAnswers=[];STRATEGY_QS.forEach(q=>{const answers=strat[q.id]||[];answers.forEach((a)=>{if(a?.trim())allAnswers.push({qid:q.id,qLabel:q.label,aText:a.trim()});});});let selBranch=angle?.sourceQuestion?{qid:angle.sourceQuestion,aText:angle.sourceAnswer}:null;if(allAnswers.length){const br=h("div",{class:"frow"});br.appendChild(h("label",{class:"flabel"},"Branch from a Strategy Answer (optional)"));br.appendChild(css(h("div",{},"Which specific answer inspired this angle?"),{fontSize:"11px",color:"var(--subtle)",marginBottom:"8px"}));const bl=h("div",{class:"branch-list"});allAnswers.forEach(item=>{const isOn=()=>selBranch&&selBranch.qid===item.qid&&selBranch.aText===item.aText;const row=h("div",{class:"branch-row"+(isOn()?" on":"")});row.appendChild(h("div",{class:"branch-q"},item.qLabel));row.appendChild(h("div",{class:"branch-a"},`"${item.aText}"`));row.dataset.key=item.qid+"||"+item.aText;row.onclick=()=>{const already=isOn();selBranch=already?null:{qid:item.qid,aText:item.aText};bl.querySelectorAll(".branch-row").forEach(r=>{r.classList.toggle("on",r.dataset.key===item.qid+"||"+item.aText&&!already);});};bl.appendChild(row);});br.appendChild(bl);mb.appendChild(br);}modal.appendChild(mb);const mf=h("div",{class:"modal-foot"});mf.appendChild(h("button",{class:"btn btn-ghost",onclick:()=>bg.remove()},"Cancel"));mf.appendChild(h("button",{class:"btn btn-dark",onclick:()=>{const name=ni.value.trim();if(!name)return;const data={name,color:selColor,stage:selStage,sourceQuestion:selBranch?.qid||null,sourceAnswer:selBranch?.aText||null,brief:angle?.brief||{},tasks:angle?.tasks||[]};if(!DB.products[pid].angles)DB.products[pid].angles={};if(isEdit)Object.assign(DB.products[pid].angles[aid],data);else DB.products[pid].angles[genId()]=data;save();render();bg.remove();}},isEdit?"Save Changes":"Create Angle"));modal.appendChild(mf);bg.appendChild(modal);document.body.appendChild(bg);setTimeout(()=>ni.focus(),50);}
 function openBriefModal(pid,aid,angle){const bg=mkBg();const modal=h("div",{class:"modal"});modal.appendChild(mkHead("Brief — "+angle.name,()=>bg.remove()));const mb=h("div",{class:"modal-body"});const existing=angle.brief||{};const brief={...existing};if(!brief.createdAt)brief.createdAt=Date.now();mb.appendChild(h("div",{class:"brief-date-pill"},"📅 Briefed "+fmtDate(brief.createdAt)));[{key:"objective",label:"Objective",ph:"What's the goal of this content?"},{key:"formats",label:"Content Formats",ph:"UGC, talking head, GRWM, demo, before/after…"},{key:"hooks",label:"Hook Ideas",ph:"Opening lines or visual hooks to test"},{key:"copy",label:"Copy Notes",ph:"Key phrases, proof points, copy direction"}].forEach(f=>{const r=h("div",{class:"frow"});r.appendChild(h("label",{class:"flabel"},f.label));const ta=h("textarea",{class:"finput",placeholder:f.ph});ta.value=brief[f.key]||"";ta.oninput=e=>{brief[f.key]=e.target.value;};r.appendChild(ta);mb.appendChild(r);});modal.appendChild(mb);const mf=h("div",{class:"modal-foot"});mf.appendChild(h("button",{class:"btn btn-ghost",onclick:()=>bg.remove()},"Cancel"));mf.appendChild(h("button",{class:"btn btn-dark",onclick:()=>{DB.products[pid].angles[aid].brief=brief;save();render();bg.remove();}},"Save Brief"));modal.appendChild(mf);bg.appendChild(modal);document.body.appendChild(bg);}
 function openTaskModal(pid,aid,angle,idx){const isEdit=idx!==null;const ex=isEdit?(angle.tasks[idx]||{}):{};const bg=mkBg();const modal=h("div",{class:"modal"});modal.appendChild(mkHead(isEdit?"Edit Task":"Add Task — "+angle.name,()=>bg.remove()));const mb=h("div",{class:"modal-body"});const brief=angle.brief||{};if(brief.objective){const ctx=h("div",{class:"brief-ctx"});ctx.appendChild(h("strong",{},"Brief: "));ctx.appendChild(document.createTextNode(brief.objective));mb.appendChild(ctx);}const vals={title:ex.title||"",assignee:ex.assignee||"",due:ex.due||""};const tr=h("div",{class:"frow"});tr.appendChild(h("label",{class:"flabel"},"Task"));const ti=h("input",{class:"finput",placeholder:"e.g. Film UGC demo, Write hook copy…",value:vals.title});ti.oninput=e=>vals.title=e.target.value;tr.appendChild(ti);mb.appendChild(tr);const ar=h("div",{class:"frow"});ar.appendChild(h("label",{class:"flabel"},"Assigned To"));const ai=h("input",{class:"finput",placeholder:"e.g. Amber",value:vals.assignee});ai.oninput=e=>vals.assignee=e.target.value;ar.appendChild(ai);mb.appendChild(ar);const dr=h("div",{class:"frow"});dr.appendChild(h("label",{class:"flabel"},"Due Date"));const di=h("input",{class:"finput",type:"date",value:vals.due});di.oninput=e=>vals.due=e.target.value;dr.appendChild(di);mb.appendChild(dr);if(isEdit&&ex.assignedAt)mb.appendChild(css(h("div",{},"Assigned: "+fmtDate(ex.assignedAt)),{fontSize:"11px",color:"var(--subtle)",marginTop:"-8px",marginBottom:"12px"}));modal.appendChild(mb);const mf=h("div",{class:"modal-foot"});mf.appendChild(h("button",{class:"btn btn-ghost",onclick:()=>bg.remove()},"Cancel"));mf.appendChild(h("button",{class:"btn btn-dark",onclick:()=>{if(!vals.title.trim())return;const task={id:ex.id||genId(),title:vals.title.trim(),assignee:vals.assignee.trim(),due:vals.due,assignedAt:ex.assignedAt||Date.now(),done:ex.done||false};if(!DB.products[pid].angles[aid].tasks)DB.products[pid].angles[aid].tasks=[];if(isEdit)DB.products[pid].angles[aid].tasks[idx]=task;else DB.products[pid].angles[aid].tasks.push(task);save();render();bg.remove();}},isEdit?"Save Task":"Add Task"));modal.appendChild(mf);bg.appendChild(modal);document.body.appendChild(bg);setTimeout(()=>ti.focus(),50);}
+
+
+/* ════════════════════════════════════════
+   REVIEWS SYSTEM
+════════════════════════════════════════ */
+
+// Convert any Google Sheets URL → CSV export URL
+function sheetToCsvUrl(url) {
+  var m = url.match(/\/d\/([a-zA-Z0-9-_]+)/);
+  if (!m) return null;
+  var id = m[1];
+  var gidM = url.match(/[#&?]gid=([0-9]+)/);
+  var gid = gidM ? gidM[1] : '0';
+  return 'https://docs.google.com/spreadsheets/d/' + id + '/export?format=csv&gid=' + gid;
+}
+
+// Parse CSV text → array of objects using header row
+function parseCsv(text) {
+  var lines = text.split(/\r?\n/).filter(function(l){ return l.trim(); });
+  if (lines.length < 2) return [];
+  function splitCsvRow(row) {
+    var result = [], cur = '', inQ = false;
+    for (var i = 0; i < row.length; i++) {
+      var ch = row[i];
+      if (ch === '"') {
+        if (inQ && row[i+1] === '"') { cur += '"'; i++; }
+        else inQ = !inQ;
+      } else if (ch === ',' && !inQ) {
+        result.push(cur); cur = '';
+      } else cur += ch;
+    }
+    result.push(cur);
+    return result;
+  }
+  var headers = splitCsvRow(lines[0]);
+  return lines.slice(1).map(function(line) {
+    var vals = splitCsvRow(line);
+    var obj = {};
+    headers.forEach(function(hdr, i){ obj[hdr.trim()] = (vals[i] || '').trim(); });
+    return obj;
+  }).filter(function(r){ return r['Body'] || r['Title']; });
+}
+// Sync sheet for a product
+async function syncSheet(pid) {
+  const p = DB.products[pid];
+  if (!p.sheetUrl) return;
+  const csvUrl = sheetToCsvUrl(p.sheetUrl);
+  if (!csvUrl) { alert('Invalid Google Sheets URL'); return; }
+
+  setSyncStatus('saving');
+  try {
+    const res = await fetch(csvUrl);
+    if (!res.ok) throw new Error('Could not fetch sheet. Make sure it is shared as "Anyone with link can view".');
+    const text = await res.text();
+    const rows = parseCsv(text);
+    if (!DB.products[pid].reviews) DB.products[pid].reviews = {};
+    // Keyed by Okendo ID or row index for deduplication
+    rows.forEach((row, i) => {
+      const key = (row['Okendo ID'] || ('row_'+i)).replace(/[^a-zA-Z0-9_-]/g,'_');
+      DB.products[pid].reviews[key] = {
+        id:        row['Okendo ID'] || '',
+        name:      row['Name'] || 'Anonymous',
+        sentiment: (row['Sentiment'] || 'neutral').toLowerCase(),
+        rating:    parseInt(row['Rating']) || 0,
+        product:   row['Product'] || '',
+        title:     row['Title'] || '',
+        body:      row['Body'] || '',
+        synced:    Date.now(),
+      };
+    });
+    p.lastSynced = Date.now();
+    save();
+    setSyncStatus('live');
+    render();
+  } catch(e) {
+    setSyncStatus('live');
+    alert('Sync failed: ' + e.message);
+  }
+}
+
+// Build the Reviews tab content
+function buildReviewsSection(pid, p) {
+  const wrap = h('div', {});
+
+  // ── Sheet setup / sync bar ──
+  if (!p.sheetUrl) {
+    const setup = h('div', {class:'sheet-setup'});
+    setup.appendChild(h('div', {class:'sheet-setup-title'}, '🔗 Connect your Google Sheet'));
+    setup.appendChild(h('div', {class:'sheet-setup-sub'},
+      'Paste your Google Sheet URL below. Make sure the sheet is set to "Anyone with link can view". Columns expected: Okendo ID, Name, Sentiment, Rating, Product, Title, Body.'
+    ));
+    const row = h('div', {class:'sheet-input-row'});
+    const inp = h('input', {class:'sheet-input', placeholder:'https://docs.google.com/spreadsheets/d/...'});
+    const connectBtn = h('button', {class:'btn btn-dark btn-sm', onclick: async () => {
+      const url = inp.value.trim();
+      if (!url) return;
+      DB.products[pid].sheetUrl = url;
+      save();
+      await syncSheet(pid);
+    }}, 'Connect & Sync');
+    row.appendChild(inp); row.appendChild(connectBtn);
+    setup.appendChild(row);
+    wrap.appendChild(setup);
+    return wrap;
+  }
+
+  // ── Sync bar (already connected) ──
+  const syncBar = h('div', {class:'sync-bar'});
+  syncBar.appendChild(css(h('span', {}, '🔗'), {fontSize:'14px', flexShrink:'0'}));
+  syncBar.appendChild(h('span', {class:'sync-bar-url'}, p.sheetUrl));
+  const barActs = h('div', {class:'sync-bar-actions'});
+  barActs.appendChild(h('button', {class:'btn btn-dark btn-xs', onclick: async () => {
+    await syncSheet(pid);
+  }}, '↻ Sync Now'));
+  barActs.appendChild(h('button', {class:'btn btn-ghost btn-xs', onclick: () => {
+    if (confirm('Disconnect this sheet?')) {
+      delete DB.products[pid].sheetUrl;
+      delete DB.products[pid].reviews;
+      save(); render();
+    }
+  }}, 'Disconnect'));
+  if (p.lastSynced) barActs.appendChild(css(h('span', {}, 'Last synced ' + fmtDate(p.lastSynced)), {fontSize:'10px', color:'var(--subtle)', fontWeight:'500'}));
+  syncBar.appendChild(barActs);
+  wrap.appendChild(syncBar);
+
+  // ── Reviews ──
+  const reviews = Object.values(p.reviews || {});
+  if (!reviews.length) {
+    wrap.appendChild(buildEmpty('No reviews yet', 'Hit Sync Now to pull from your sheet.'));
+    return wrap;
+  }
+
+  // Toolbar
+  const toolbar = h('div', {class:'reviews-toolbar'});
+  toolbar.appendChild(h('span', {class:'reviews-meta'}, reviews.length + ' reviews'));
+  const filters = h('div', {class:'reviews-filters'});
+  let activeFilter = 'All';
+  const grid = h('div', {class:'reviews-grid'});
+
+  function applyRFilter(f) {
+    activeFilter = f;
+    filters.querySelectorAll('.rfil').forEach(t => t.classList.remove('on'));
+    filters.querySelector('[data-rf="'+f+'"]').classList.add('on');
+    grid.innerHTML = '';
+    let filtered = reviews;
+    if (f === 'Positive') filtered = reviews.filter(r => r.sentiment === 'positive');
+    if (f === 'Negative') filtered = reviews.filter(r => r.sentiment === 'negative');
+    if (f === 'Neutral')  filtered = reviews.filter(r => r.sentiment === 'neutral');
+    if (f === '5★') filtered = reviews.filter(r => r.rating === 5);
+    if (f === '1-2★') filtered = reviews.filter(r => r.rating <= 2 && r.rating > 0);
+    filtered.forEach(r => grid.appendChild(buildReviewCard(pid, p, r)));
+    if (!filtered.length) grid.appendChild(buildEmpty('No reviews match', 'Try a different filter.'));
+  }
+
+  ['All','Positive','Negative','Neutral','5★','1-2★'].forEach(f => {
+    const t = h('button', {class:'rfil'}, f); t.dataset.rf = f;
+    t.onclick = () => applyRFilter(f);
+    filters.appendChild(t);
+  });
+  toolbar.appendChild(filters);
+  wrap.appendChild(toolbar);
+  applyRFilter('All');
+  wrap.appendChild(grid);
+  return wrap;
+}
+
+function buildReviewCard(pid, p, r) {
+  const card = h('div', {class:'review-card'});
+  card.dataset.reviewId = r.id;
+
+  // Top row
+  const top = h('div', {class:'review-card-top'});
+  const left = h('div', {class:'review-left'});
+  const initials = (r.name||'?').split(' ').map(w=>w[0]||'').join('').slice(0,2).toUpperCase();
+  left.appendChild(h('div', {class:'review-avatar'}, initials));
+  const nameWrap = h('div', {});
+  nameWrap.appendChild(h('div', {class:'review-name'}, r.name || 'Anonymous'));
+  if (r.product) nameWrap.appendChild(h('div', {class:'review-product'}, r.product));
+  left.appendChild(nameWrap);
+  top.appendChild(left);
+
+  const right = h('div', {class:'review-right'});
+  // Stars
+  if (r.rating) {
+    const stars = h('div', {class:'stars'});
+    for (let i=1; i<=5; i++) stars.appendChild(h('span', {class:'star'+(i>r.rating?' empty':'')}, '★'));
+    right.appendChild(stars);
+  }
+  const sentCls = {positive:'sent-positive', negative:'sent-negative', neutral:'sent-neutral'}[r.sentiment] || 'sent-neutral';
+  right.appendChild(h('span', {class:'sentiment-badge '+sentCls}, r.sentiment || 'neutral'));
+  top.appendChild(right);
+  card.appendChild(top);
+
+  // Title + body
+  if (r.title) card.appendChild(h('div', {class:'review-title'}, r.title));
+  const bodyEl = h('div', {class:'review-body'}, r.body || '');
+  card.appendChild(bodyEl);
+  if ((r.body||'').length > 200) {
+    let expanded = false;
+    const expBtn = h('button', {class:'review-expand', onclick:() => {
+      expanded = !expanded;
+      bodyEl.classList.toggle('expanded', expanded);
+      expBtn.textContent = expanded ? 'Show less' : 'Read more';
+    }}, 'Read more');
+    card.appendChild(expBtn);
+  }
+
+  // Footer
+  const footer = h('div', {class:'review-footer'});
+  footer.appendChild(h('span', {class:'review-date'}, r.id ? 'ID: '+r.id.slice(0,12)+'…' : ''));
+
+  // Generate angles button
+  const genWrap = h('div', {});
+  const genBtn = h('button', {class:'btn btn-dark btn-xs', onclick: () => generateAnglesFromReview(pid, p, r, card, genBtn)},
+    '✦ Generate Angles'
+  );
+  genWrap.appendChild(genBtn);
+  footer.appendChild(genWrap);
+  card.appendChild(footer);
+
+  return card;
+}
+
+// Call Claude API to generate angles from a review
+async function generateAnglesFromReview(pid, p, review, card, btn) {
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Generating…';
+
+  // Remove any existing generated angles
+  const existing = card.querySelector('.gen-angles-wrap');
+  if (existing) existing.remove();
+
+  // Build strategy context
+  const strat = p.strategy || {};
+  const stratLines = Object.entries(strat).map(([k,v]) => {
+    const q = STRATEGY_QS.find(q=>q.id===k);
+    if (!q) return '';
+    const vals = Array.isArray(v) ? v.filter(Boolean) : [v].filter(Boolean);
+    if (!vals.length) return '';
+    return `${q.label}: ${vals.join(' / ')}`;
+  }).filter(Boolean).join('\n');
+
+  const prompt = `You are a creative strategist for Kopari Beauty, a premium skincare and beauty brand.
+
+PRODUCT: ${p.name || 'Kopari product'}
+${stratLines ? 'STRATEGY CONTEXT:\n' + stratLines : ''}
+
+CUSTOMER REVIEW:
+Reviewer: ${review.name}
+Rating: ${review.rating}/5 stars
+Sentiment: ${review.sentiment}
+Title: "${review.title}"
+Review: "${review.body}"
+
+Based on this specific review, generate exactly 3 ad angle ideas. Each angle should:
+- Use the customer's own language or emotional truth as a hook
+- Be specific to what THIS reviewer said (not generic)
+- Be actionable as a paid social ad concept (Meta/Instagram)
+
+Respond ONLY with valid JSON in this exact format, no markdown, no extra text:
+{
+  "angles": [
+    {"hook": "Short punchy hook (under 10 words)", "why": "1-2 sentences on why this angle works and how to execute it"},
+    {"hook": "Short punchy hook (under 10 words)", "why": "1-2 sentences on why this angle works and how to execute it"},
+    {"hook": "Short punchy hook (under 10 words)", "why": "1-2 sentences on why this angle works and how to execute it"}
+  ]
+}`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await res.json();
+    const raw = (data.content || []).map(c => c.text || '').join('');
+    const clean = raw.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(clean);
+    const angles = parsed.angles || [];
+
+    // Render generated angles
+    const genWrap = h('div', {class:'gen-angles-wrap'});
+    genWrap.appendChild(h('div', {class:'gen-angles-title'}, '✦ Generated Angles from this Review'));
+    angles.forEach(angle => {
+      const item = h('div', {class:'gen-angle-item'});
+      const txt = h('div', {class:'gen-angle-text'});
+      txt.appendChild(h('div', {class:'gen-angle-hook'}, angle.hook));
+      txt.appendChild(h('div', {class:'gen-angle-why'}, angle.why));
+      item.appendChild(txt);
+      // Save angle button
+      const saveBtn = h('button', {class:'btn btn-dark btn-xs gen-angle-save', onclick: () => {
+        if (!DB.products[pid].angles) DB.products[pid].angles = {};
+        const nid = genId();
+        DB.products[pid].angles[nid] = {
+          name: angle.hook,
+          color: ANGLE_COLORS[Math.floor(Math.random()*ANGLE_COLORS.length)],
+          stage: 'Strategy',
+          sourceQuestion: null,
+          sourceAnswer: null,
+          sourceReview: review.body.slice(0, 120),
+          brief: { objective: angle.why, hooks: angle.hook },
+          tasks: []
+        };
+        save();
+        saveBtn.textContent = '✓ Saved';
+        saveBtn.disabled = true;
+        css(saveBtn, {background:'#dcfce7', color:'#166534'});
+      }}, '+ Save Angle');
+      item.appendChild(saveBtn);
+      genWrap.appendChild(item);
+    });
+    card.appendChild(genWrap);
+  } catch(e) {
+    const errWrap = h('div', {class:'gen-angles-wrap'});
+    errWrap.appendChild(css(h('div', {}, '⚠ Could not generate angles. Check your connection and try again.'), {fontSize:'12px', color:'var(--danger)', padding:'10px 0'}));
+    card.appendChild(errWrap);
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '↻ Regenerate';
+}
+
 if(window.__fbReady)initFB();
 else document.addEventListener("fb-ready",initFB);
 </script>
