@@ -472,6 +472,299 @@ function mkBg(){const bg=h("div",{class:"modal-bg"});bg.onclick=e=>{if(e.target=
 function mkHead(title,onClose){const mh=h("div",{class:"modal-head"});mh.appendChild(h("div",{class:"modal-title"},title));mh.appendChild(h("button",{class:"modal-close",onclick:onClose},"×"));return mh;}
 function openProductModal(id=null,p=null){const isEdit=!!id;const bg=mkBg();const modal=h("div",{class:"modal"});modal.appendChild(mkHead(isEdit?"Edit Product":"New Product",()=>bg.remove()));const mb=h("div",{class:"modal-body"});const nr=h("div",{class:"frow"});nr.appendChild(h("label",{class:"flabel"},"Product / Bundle Name"));const ni=h("input",{class:"finput",placeholder:"e.g. Sun Veil Illuminating Elixir SPF 38",value:p?.name||""});nr.appendChild(ni);mb.appendChild(nr);const cr=h("div",{class:"frow"});cr.appendChild(h("label",{class:"flabel"},"Category"));const cs=h("select",{class:"finput"});CATEGORIES.forEach(c=>{const o=h("option",{value:c},c);if(p?.category===c)o.selected=true;cs.appendChild(o);});cr.appendChild(cs);mb.appendChild(cr);modal.appendChild(mb);const mf=h("div",{class:"modal-foot"});mf.appendChild(h("button",{class:"btn btn-ghost",onclick:()=>bg.remove()},"Cancel"));mf.appendChild(h("button",{class:"btn btn-dark",onclick:()=>{const name=ni.value.trim();if(!name)return;if(isEdit){DB.products[id].name=name;DB.products[id].category=cs.value;}else{const nid=genId();DB.products[nid]={name,category:cs.value,strategy:{},angles:{}};}save();render();bg.remove();}},"Create Product" ));modal.appendChild(mf);bg.appendChild(modal);document.body.appendChild(bg);setTimeout(()=>ni.focus(),50);}
 function openAngleModal(pid,p,aid=null,angle=null){const isEdit=!!aid;const bg=mkBg();const modal=h("div",{class:"modal"});modal.appendChild(mkHead(isEdit?"Edit Angle":"New Angle",()=>bg.remove()));const mb=h("div",{class:"modal-body"});const nr=h("div",{class:"frow"});nr.appendChild(h("label",{class:"flabel"},"Angle Name"));const ni=h("input",{class:"finput",placeholder:"e.g. Confidence angle, Routine swap angle…",value:angle?.name||""});nr.appendChild(ni);mb.appendChild(nr);const cr=h("div",{class:"frow"});cr.appendChild(h("label",{class:"flabel"},"Color"));let selColor=angle?.color||ANGLE_COLORS[0];const cp=h("div",{class:"color-row"});ANGLE_COLORS.forEach(c=>{const dot=css(h("div",{class:"cpick"+(selColor===c?" on":""),onclick:()=>{selColor=c;cp.querySelectorAll(".cpick").forEach(d=>d.classList.remove("on"));dot.classList.add("on");}}),{background:c});cp.appendChild(dot);});cr.appendChild(cp);mb.appendChild(cr);const sr=h("div",{class:"frow"});sr.appendChild(h("label",{class:"flabel"},"Stage"));let selStage=angle?.stage||"Strategy";const sp=h("div",{class:"stage-picker"});STAGES.forEach(s=>{const cfg=sc(s);const btn=h("button",{class:"spick",onclick:()=>{selStage=s;sp.querySelectorAll(".spick").forEach(b=>{b.style.background="";b.style.borderColor="";b.style.color="";});Object.assign(btn.style,{background:cfg.bg,borderColor:cfg.color,color:cfg.color});}},s);if(selStage===s)Object.assign(btn.style,{background:cfg.bg,borderColor:cfg.color,color:cfg.color});sp.appendChild(btn);});sr.appendChild(sp);mb.appendChild(sr);const strat=p.strategy||{};const allAnswers=[];STRATEGY_QS.forEach(q=>{const answers=strat[q.id]||[];answers.forEach((a)=>{if(a?.trim())allAnswers.push({qid:q.id,qLabel:q.label,aText:a.trim()});});});let selBranch=angle?.sourceQuestion?{qid:angle.sourceQuestion,aText:angle.sourceAnswer}:null;if(allAnswers.length){const br=h("div",{class:"frow"});br.appendChild(h("label",{class:"flabel"},"Branch from a Strategy Answer (optional)"));br.appendChild(css(h("div",{},"Which specific answer inspired this angle?"),{fontSize:"11px",color:"var(--subtle)",marginBottom:"8px"}));const bl=h("div",{class:"branch-list"});allAnswers.forEach(item=>{const isOn=()=>selBranch&&selBranch.qid===item.qid&&selBranch.aText===item.aText;const row=h("div",{class:"branch-row"+(isOn()?" on":"")});row.appendChild(h("div",{class:"branch-q"},item.qLabel));row.appendChild(h("div",{class:"branch-a"},`"${item.aText}"`));row.dataset.key=item.qid+"||"+item.aText;row.onclick=()=>{const already=isOn();selBranch=already?null:{qid:item.qid,aText:item.aText};bl.querySelectorAll(".branch-row").forEach(r=>{r.classList.toggle("on",r.dataset.key===item.qid+"||"+item.aText&&!already);});};bl.appendChild(row);});br.appendChild(bl);mb.appendChild(br);}modal.appendChild(mb);const mf=h("div",{class:"modal-foot"});mf.appendChild(h("button",{class:"btn btn-ghost",onclick:()=>bg.remove()},"Cancel"));mf.appendChild(h("button",{class:"btn btn-dark",onclick:()=>{const name=ni.value.trim();if(!name)return;const data={name,color:selColor,stage:selStage,sourceQuestion:selBranch?.qid||null,sourceAnswer:selBranch?.aText||null,brief:angle?.brief||{},tasks:angle?.tasks||[]};if(!DB.products[pid].angles)DB.products[pid].angles={};if(isEdit)Object.assign(DB.products[pid].angles[aid],data);else{var naid=genId();data.createdAt=Date.now();DB.products[pid].angles[naid]=data;}save();render();bg.remove();}},isEdit?"Save Changes":"Create Angle"));modal.appendChild(mf);bg.appendChild(modal);document.body.appendChild(bg);setTimeout(()=>ni.focus(),50);}
+
+/* ════════════════════════════════════════
+   REVIEWS SYSTEM
+════════════════════════════════════════ */
+
+function sheetToCsvUrl(url) {
+  var m = url.match(/\/d\/([a-zA-Z0-9-_]+)/);
+  if (!m) return null;
+  var id = m[1];
+  var gidM = url.match(/[#&?]gid=([0-9]+)/);
+  var gid = gidM ? gidM[1] : '0';
+  return 'https://docs.google.com/spreadsheets/d/' + id + '/export?format=csv&gid=' + gid;
+}
+
+function parseCsv(text) {
+  var normalized = text.replace(/\r/g, '');
+  var lines = normalized.split('\n').filter(function(l){ return l.trim(); });
+  if (lines.length < 2) return [];
+  function splitCsvRow(row) {
+    var result = [], cur = '', inQ = false;
+    for (var i = 0; i < row.length; i++) {
+      var ch = row[i];
+      if (ch === '"') {
+        if (inQ && row[i+1] === '"') { cur += '"'; i++; }
+        else inQ = !inQ;
+      } else if (ch === ',' && !inQ) { result.push(cur); cur = ''; }
+      else cur += ch;
+    }
+    result.push(cur);
+    return result;
+  }
+  var headers = splitCsvRow(lines[0]);
+  return lines.slice(1).map(function(line) {
+    var vals = splitCsvRow(line);
+    var obj = {};
+    headers.forEach(function(hdr, i){ obj[hdr.trim()] = (vals[i] || '').trim(); });
+    return obj;
+  }).filter(function(r){ return r['Body'] || r['Title']; });
+}
+
+async function syncSheet(pid) {
+  var p = DB.products[pid];
+  if (!p.sheetUrl) return;
+  var mId = p.sheetUrl.match(/\/d\/([a-zA-Z0-9-_]+)/);
+  if (!mId) { alert('Invalid Google Sheets URL'); return; }
+  var sheetId = mId[1];
+  setSyncStatus('saving');
+  try {
+    var allRows = [];
+    var tabNames = p.sheetTabs || [];
+    if (tabNames.length === 0) {
+      var r0 = await fetch('https://docs.google.com/spreadsheets/d/' + sheetId + '/export?format=csv&gid=0');
+      if (!r0.ok) throw new Error('Could not fetch sheet. Make sure it is shared as "Anyone with link can view".');
+      var rows0 = parseCsv(await r0.text());
+      rows0.forEach(function(row){ row._tab = 'Tab 1'; });
+      allRows = allRows.concat(rows0);
+      for (var g = 1; g <= 5; g++) {
+        try {
+          var rG = await fetch('https://docs.google.com/spreadsheets/d/' + sheetId + '/export?format=csv&gid=' + g);
+          if (!rG.ok) break;
+          var tG = await rG.text();
+          if (tG.includes('<!DOCTYPE') || tG.includes('<html')) break;
+          var rowsG = parseCsv(tG);
+          if (!rowsG.length) break;
+          rowsG.forEach(function(row){ row._tab = 'Tab ' + (g+1); });
+          allRows = allRows.concat(rowsG);
+        } catch(e) { break; }
+      }
+    } else {
+      for (var ti = 0; ti < tabNames.length; ti++) {
+        var tab = tabNames[ti];
+        var resp = await fetch('https://docs.google.com/spreadsheets/d/' + sheetId + '/export?format=csv&gid=' + tab.gid);
+        if (!resp.ok) continue;
+        var text = await resp.text();
+        if (text.includes('<!DOCTYPE') || text.includes('<html')) continue;
+        var rows = parseCsv(text);
+        rows.forEach(function(row){ row._tab = tab.name; });
+        allRows = allRows.concat(rows);
+      }
+    }
+    DB.products[pid].reviews = {};
+    allRows.forEach(function(row, i) {
+      var key = (row['Okendo ID'] || ('row_'+i)).replace(/[^a-zA-Z0-9_-]/g,'_');
+      while (DB.products[pid].reviews[key]) key = key + '_x';
+      DB.products[pid].reviews[key] = {
+        id: row['Okendo ID'] || '',
+        name: row['Name'] || 'Anonymous',
+        sentiment: (row['Sentiment'] || 'neutral').toLowerCase(),
+        rating: parseInt(row['Rating']) || 0,
+        product: row['Product'] || '',
+        title: row['Title'] || '',
+        body: row['Body'] || '',
+        tab: row['_tab'] || '',
+        synced: Date.now(),
+      };
+    });
+    p.lastSynced = Date.now();
+    save(); setSyncStatus('live'); render();
+  } catch(e) {
+    setSyncStatus('live');
+    alert('Sync failed: ' + e.message);
+  }
+}
+
+function buildReviewsSection(pid, p) {
+  var wrap = h('div', {});
+
+  if (!p.sheetUrl) {
+    var setup = h('div', {class:'sheet-setup'});
+    setup.appendChild(h('div', {class:'sheet-setup-title'}, '🔗 Connect your Google Sheet'));
+    setup.appendChild(h('div', {class:'sheet-setup-sub'}, 'Paste your Google Sheet URL. Make sure it is shared as "Anyone with link can view". Columns: Okendo ID, Name, Sentiment, Rating, Product, Title, Body.'));
+    var row = h('div', {class:'sheet-input-row'});
+    var inp = h('input', {class:'sheet-input', placeholder:'https://docs.google.com/spreadsheets/d/...'});
+    var connectBtn = h('button', {class:'btn btn-dark btn-sm', onclick: async function() {
+      var url = inp.value.trim(); if (!url) return;
+      DB.products[pid].sheetUrl = url; save();
+      await syncSheet(pid);
+    }}, 'Connect & Sync');
+    row.appendChild(inp); row.appendChild(connectBtn);
+    setup.appendChild(row); wrap.appendChild(setup);
+    return wrap;
+  }
+
+  var syncBar = h('div', {class:'sync-bar'});
+  syncBar.appendChild(css(h('span', {}, '🔗'), {fontSize:'14px', flexShrink:'0'}));
+  syncBar.appendChild(h('span', {class:'sync-bar-url'}, p.sheetUrl));
+  var barActs = h('div', {class:'sync-bar-actions'});
+  barActs.appendChild(h('button', {class:'btn btn-dark btn-xs', onclick: async function(){ await syncSheet(pid); }}, '↻ Sync Now'));
+  barActs.appendChild(h('button', {class:'btn btn-ghost btn-xs', onclick: function() {
+    if (confirm('Disconnect this sheet?')) { delete DB.products[pid].sheetUrl; delete DB.products[pid].reviews; delete DB.products[pid].sheetTabs; save(); render(); }
+  }}, 'Disconnect'));
+  if (p.lastSynced) barActs.appendChild(css(h('span', {}, 'Synced ' + fmtDate(p.lastSynced)), {fontSize:'10px',color:'var(--subtle)',fontWeight:'500'}));
+  syncBar.appendChild(barActs);
+  wrap.appendChild(syncBar);
+
+  var reviews = Object.values(p.reviews || {});
+  if (!reviews.length) { wrap.appendChild(buildEmpty('No reviews yet', 'Hit Sync Now to pull from your sheet.')); return wrap; }
+
+  // Product filter
+  var productNames = [];
+  reviews.forEach(function(r) { if (r.product && productNames.indexOf(r.product) === -1) productNames.push(r.product); });
+  productNames.sort();
+
+  var activeProd = 'All Products';
+  var activeSent = 'All';
+
+  if (productNames.length > 1) {
+    var pfWrap = css(h('div', {}), {display:'flex',alignItems:'center',gap:'8px',marginBottom:'12px',flexWrap:'wrap'});
+    pfWrap.appendChild(css(h('span', {}, 'Product:'), {fontSize:'11px',fontWeight:'700',color:'var(--subtle)',letterSpacing:'.06em',textTransform:'uppercase',flexShrink:'0'}));
+    var pfRow = h('div', {class:'reviews-filters'});
+    function buildPfRow() {
+      pfRow.innerHTML = '';
+      ['All Products'].concat(productNames).forEach(function(pname) {
+        var t = h('button', {class:'rfil' + (pname === activeProd ? ' on' : '')}, pname);
+        t.dataset.pf = pname;
+        t.onclick = function() { activeProd = pname; buildPfRow(); applyFilters(); };
+        pfRow.appendChild(t);
+      });
+    }
+    pfWrap.appendChild(pfRow);
+    wrap.appendChild(pfWrap);
+    buildPfRow();
+  }
+
+  var toolbar = h('div', {class:'reviews-toolbar'});
+  var countEl = h('span', {class:'reviews-meta'}, reviews.length + ' reviews');
+  toolbar.appendChild(countEl);
+  var sfRow = h('div', {class:'reviews-filters'});
+  ['All','Positive','Negative','Neutral','5★','1-2★'].forEach(function(f) {
+    var t = h('button', {class:'rfil' + (f === activeSent ? ' on' : '')}, f);
+    t.onclick = function() {
+      activeSent = f;
+      sfRow.querySelectorAll('.rfil').forEach(function(x){ x.classList.remove('on'); });
+      t.classList.add('on');
+      applyFilters();
+    };
+    sfRow.appendChild(t);
+  });
+  toolbar.appendChild(sfRow);
+  wrap.appendChild(toolbar);
+
+  var grid = h('div', {class:'reviews-grid'});
+  wrap.appendChild(grid);
+
+  function applyFilters() {
+    grid.innerHTML = '';
+    var filtered = reviews.filter(function(r) {
+      var pm = activeProd === 'All Products' || r.product === activeProd;
+      var sm = true;
+      if (activeSent === 'Positive') sm = r.sentiment === 'positive';
+      else if (activeSent === 'Negative') sm = r.sentiment === 'negative';
+      else if (activeSent === 'Neutral') sm = r.sentiment === 'neutral';
+      else if (activeSent === '5★') sm = r.rating === 5;
+      else if (activeSent === '1-2★') sm = r.rating <= 2 && r.rating > 0;
+      return pm && sm;
+    });
+    countEl.textContent = filtered.length + (filtered.length !== reviews.length ? ' of ' + reviews.length : '') + ' reviews';
+    if (!filtered.length) { grid.appendChild(buildEmpty('No reviews match', 'Try a different filter.')); }
+    else { filtered.forEach(function(r){ grid.appendChild(buildReviewCard(pid, p, r)); }); }
+  }
+  applyFilters();
+  return wrap;
+}
+
+function buildReviewCard(pid, p, r) {
+  var card = h('div', {class:'review-card'});
+  var top = h('div', {class:'review-card-top'});
+  var left = h('div', {class:'review-left'});
+  var initials = (r.name||'?').split(' ').map(function(w){return w[0]||'';}).join('').slice(0,2).toUpperCase();
+  left.appendChild(h('div', {class:'review-avatar'}, initials));
+  var nameWrap = h('div', {});
+  nameWrap.appendChild(h('div', {class:'review-name'}, r.name||'Anonymous'));
+  if (r.product) nameWrap.appendChild(h('div', {class:'review-product'}, r.product));
+  left.appendChild(nameWrap);
+  top.appendChild(left);
+  var right = h('div', {class:'review-right'});
+  if (r.rating) {
+    var stars = h('div', {class:'stars'});
+    for (var i=1; i<=5; i++) stars.appendChild(h('span', {class:'star'+(i>r.rating?' empty':'')}, '★'));
+    right.appendChild(stars);
+  }
+  var sentCls = {positive:'sent-positive',negative:'sent-negative',neutral:'sent-neutral'}[r.sentiment]||'sent-neutral';
+  right.appendChild(h('span', {class:'sentiment-badge '+sentCls}, r.sentiment||'neutral'));
+  top.appendChild(right);
+  card.appendChild(top);
+  if (r.title) card.appendChild(h('div', {class:'review-title'}, r.title));
+  var bodyEl = h('div', {class:'review-body'}, r.body||'');
+  card.appendChild(bodyEl);
+  if ((r.body||'').length > 200) {
+    var expanded = false;
+    var expBtn = h('button', {class:'review-expand', onclick:function(){
+      expanded=!expanded; bodyEl.classList.toggle('expanded',expanded); expBtn.textContent=expanded?'Show less':'Read more';
+    }}, 'Read more');
+    card.appendChild(expBtn);
+  }
+  var footer = h('div', {class:'review-footer'});
+  footer.appendChild(h('span', {class:'review-date'}, r.id?'ID: '+r.id.slice(0,12)+'…':''));
+  var genBtn = h('button', {class:'btn btn-dark btn-xs', onclick:function(){ generateAnglesFromReview(pid,p,r,card,genBtn); }}, '+ Create Angle');
+  footer.appendChild(genBtn);
+  card.appendChild(footer);
+  return card;
+}
+
+function generateAnglesFromReview(pid, p, review, card, btn) {
+  var bg = mkBg();
+  var modal = h('div', {class:'modal'});
+  modal.appendChild(mkHead('Create Angle from Review', function(){ bg.remove(); }));
+  var mb = h('div', {class:'modal-body'});
+  var reviewCtx = css(h('div', {}), {background:'var(--cream2)',borderRadius:'10px',padding:'12px 14px',marginBottom:'18px',fontSize:'12px',color:'#374151',lineHeight:'1.7'});
+  if (review.title) reviewCtx.appendChild(css(h('div', {}, '"' + review.title + '"'), {fontWeight:'700',marginBottom:'4px',color:'var(--ink)'}));
+  reviewCtx.appendChild(h('div', {}, review.body||''));
+  var reviewMeta = css(h('div', {}), {marginTop:'8px',fontSize:'11px',color:'var(--muted)',display:'flex',gap:'10px'});
+  reviewMeta.appendChild(h('span', {}, '— ' + (review.name||'Anonymous')));
+  if (review.rating) reviewMeta.appendChild(h('span', {}, '★'.repeat(review.rating) + '☆'.repeat(5-review.rating)));
+  reviewCtx.appendChild(reviewMeta);
+  mb.appendChild(reviewCtx);
+  var nr = h('div', {class:'frow'}); nr.appendChild(h('label', {class:'flabel'}, 'Angle Name / Hook'));
+  var ni = h('input', {class:'finput', placeholder:'e.g. SPF that actually works for lazy girls'});
+  nr.appendChild(ni); mb.appendChild(nr);
+  var wr = h('div', {class:'frow'}); wr.appendChild(h('label', {class:'flabel'}, 'Why this angle works (optional)'));
+  var wi = h('textarea', {class:'finput', placeholder:'What makes this review insight powerful for an ad…'});
+  wi.style.minHeight = '70px'; wr.appendChild(wi); mb.appendChild(wr);
+  var cr = h('div', {class:'frow'}); cr.appendChild(h('label', {class:'flabel'}, 'Color'));
+  var selColor = ANGLE_COLORS[Math.floor(Math.random()*ANGLE_COLORS.length)];
+  var cp = h('div', {class:'color-row'});
+  ANGLE_COLORS.forEach(function(c) {
+    var dot = css(h('div', {class:'cpick'+(selColor===c?' on':''), onclick:function(){ selColor=c; cp.querySelectorAll('.cpick').forEach(function(d){d.classList.remove('on');}); dot.classList.add('on'); }}), {background:c});
+    cp.appendChild(dot);
+  });
+  cr.appendChild(cp); mb.appendChild(cr);
+  modal.appendChild(mb);
+  var mf = h('div', {class:'modal-foot'});
+  mf.appendChild(h('button', {class:'btn btn-ghost', onclick:function(){ bg.remove(); }}, 'Cancel'));
+  mf.appendChild(h('button', {class:'btn btn-dark', onclick:function(){
+    var name = ni.value.trim(); if (!name) return;
+    if (!DB.products[pid].angles) DB.products[pid].angles = {};
+    var nid = genId();
+    DB.products[pid].angles[nid] = {
+      name: name, color: selColor, stage: 'Strategy',
+      sourceQuestion: null, sourceAnswer: null,
+      sourceReview: (review.name||'') + ': "' + (review.body||'').slice(0,120) + ((review.body&&review.body.length>120)?'…':'') + '"',
+      objective: wi.value.trim() || ('Inspired by review: "' + (review.title||review.body.slice(0,60)) + '"'),
+      hooks: name, tasks: [], createdAt: Date.now()
+    };
+    save(); bg.remove();
+    btn.textContent = '✓ Angle Saved'; btn.disabled = true;
+    css(btn, {background:'#dcfce7', color:'#166534'});
+    setTimeout(function(){ btn.textContent='+ Create Angle'; btn.disabled=false; css(btn,{background:'',color:''}); }, 3000);
+  }}, 'Save to Angles'));
+  modal.appendChild(mf); bg.appendChild(modal); document.body.appendChild(bg);
+  setTimeout(function(){ ni.focus(); }, 50);
+}
+
 if(window.__fbReady)initFB();
 else document.addEventListener("fb-ready",initFB);
 </script>
